@@ -1,17 +1,32 @@
-# Sử dụng Python phiên bản ổn định
-FROM python:3.11-slim
+# Giai đoạn 1: Build ứng dụng
+FROM node:20-slim AS builder
 
-# Thiết lập thư mục làm việc trong máy chủ
 WORKDIR /app
 
-# Sao chép file danh sách thư viện vào
-COPY requirements.txt .
+# Sao chép file cấu hình và cài đặt dependencies
+COPY package*.json ./
+RUN npm install
 
-# Cài đặt các thư viện cần thiết
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Sao chép toàn bộ code vào máy chủ
+# Sao chép toàn bộ mã nguồn và build
 COPY . .
+RUN npm run build
 
-# Lệnh để chạy ứng dụng (ví dụ dùng Streamlit)
-CMD ["streamlit", "run", "app.py", "--server.port=10000", "--server.address=0.0.0.0"]
+# Giai đoạn 2: Phục vụ ứng dụng bằng Nginx (Nhẹ và bảo mật)
+FROM nginx:alpine
+
+# Sao chép kết quả build từ giai đoạn 1 vào thư mục phục vụ của Nginx
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Cấu hình Nginx để hỗ trợ React Router (Xử lý lỗi 404 khi reload trang)
+RUN echo 'server { \
+    listen 80; \
+    location / { \
+        root /usr/share/nginx/html; \
+        index index.html index.htm; \
+        try_files $uri $uri/ /index.html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
