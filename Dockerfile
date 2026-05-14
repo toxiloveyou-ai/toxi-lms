@@ -3,6 +3,12 @@ FROM node:20-slim AS builder
 
 WORKDIR /app
 
+# Các biến môi trường cần thiết cho quá trình Build (Vite)
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_ANON_KEY
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
+
 # Sao chép file cấu hình và cài đặt dependencies
 COPY package*.json ./
 RUN npm install
@@ -10,6 +16,7 @@ RUN npm install
 # Sao chép toàn bộ mã nguồn và build
 COPY . .
 RUN npm run build
+
 
 # Giai đoạn 2: Phục vụ ứng dụng bằng Nginx (Nhẹ và bảo mật)
 FROM nginx:alpine
