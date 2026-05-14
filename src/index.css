@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@theme {
+  /* Admin Dashboard Theme (Dark/Glass) */
+  --color-toxi-bg: #09090b;
+  --color-toxi-card: rgba(24, 24, 27, 0.7);
+  --color-toxi-border: rgba(255, 255, 255, 0.1);
+  --color-toxi-primary: #3b82f6;
+  --color-toxi-accent: #10b981;
+
+  /* Student Hub Theme (Light/Friendly) */
+  --color-student-bg: #F9F6ED;      /* Nền mặc định (Kem nhẹ) */
+  --color-student-text: #2E3192;    /* Chữ, tiêu đề (Xanh đậm) */
+  --color-student-primary: #F59E42; /* Nút, nhấn (Cam năng động) */
+  --color-student-card: #FFFFFF;
+  --color-student-border: #EADBC8;
+
+  --animate-spin-slow: spin-slow 3s linear infinite;
+  --animate-shimmer: shimmer 2s infinite;
+
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes shimmer {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(100%); }
+  }
+}
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    margin: 0;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: var(--color-toxi-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--color-toxi-border);
+  }
+  
+  .glass-panel {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.2) 100%);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .text-gradient {
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(to right, #3b82f6, #10b981);
+  }
+
+  /* Student Theme Utilities */
+  .student-card {
+    background-color: var(--color-student-card);
+    border: 1px solid var(--color-student-border);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    border-radius: 1rem;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
