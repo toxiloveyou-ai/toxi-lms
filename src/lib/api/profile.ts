@@ -93,12 +93,12 @@ export async function trackUserActivity(userId: string) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Lấy dữ liệu dashboard: decks đang học + progress
+// Lấy dữ liệu dashboard: decks đang học + progress (Đã tối ưu)
 // ─────────────────────────────────────────────────────────────
 export async function getDashboardData(userId: string) {
   const now = new Date().toISOString();
 
-  // Decks đang học
+  // 1. Fetch Decks
   const { data: decks } = await supabase
     .from('decks')
     .select('id, name, description, level_id, topic_id, is_smart, created_at')
@@ -106,78 +106,75 @@ export async function getDashboardData(userId: string) {
     .order('created_at', { ascending: false })
     .limit(6);
 
-  // Đếm cards + progress cho từng deck
-  const decksWithStats = await Promise.all(
-    (decks || []).map(async (deck) => {
-      const { count: totalCount } = await supabase
-        .from('cards')
-        .select('*', { count: 'exact', head: true })
-        .eq('deck_id', deck.id);
+  if (!decks || decks.length === 0) {
+    return { decks: [], lastExam: null, bestToxiCert: null, recentSearches: [] };
+  }
 
-      const { count: masteredCount } = await supabase
-        .from('user_progress')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .eq('status', 'mastered')
-        .in('card_id',
-          (await supabase.from('cards').select('id').eq('deck_id', deck.id))
-            .data?.map(c => c.id) || []
-        );
+  const deckIds = decks.map(d => d.id);
 
-      const { count: dueCount } = await supabase
-        .from('user_progress')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .neq('status', 'mastered')
-        .lte('next_review', now)
-        .in('card_id',
-          (await supabase.from('cards').select('id').eq('deck_id', deck.id))
-            .data?.map(c => c.id) || []
-        );
+  // 2. Fetch all cards for these decks in one go
+  const { data: allCards } = await supabase
+    .from('cards')
+    .select('id, deck_id')
+    .in('deck_id', deckIds);
 
-      const total = totalCount || 0;
-      const mastered = masteredCount || 0;
-      return {
-        ...deck,
-        count: total,
-        mastered,
-        due: dueCount || 0,
-        progress: total > 0 ? Math.round((mastered / total) * 100) : 0,
-      };
-    })
-  );
-
-  // Kết quả thi gần nhất để lấy radar stats
-  const { data: lastExam } = await supabase
-    .from('edu_exam_results')
-    .select('radar_stats, score, created_at')
+  const cardIds = allCards?.map(c => c.id) || [];
+  
+  // 3. Fetch all progress for these cards in one go
+  const { data: allProgress } = await supabase
+    .from('user_progress')
+    .select('card_id, status, next_review')
     .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .in('card_id', cardIds);
 
-  // Lịch sử tra từ gần nhất
-  const { data: recentSearches } = await supabase
-    .from('search_history')
-    .select('keyword')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(5);
+  // 4. Group data in memory for efficiency
+  const progressMap = new Map();
+  allProgress?.forEach(p => {
+    progressMap.set(p.card_id, p);
+  });
 
-  // Kết quả thi Toxi tốt nhất để lấy chứng chỉ
-  const { data: bestToxiCert } = await supabase
-    .from('edu_exam_results')
-    .select('score, created_at')
-    .eq('user_id', userId)
-    .order('score', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const cardsByDeck = new Map();
+  allCards?.forEach(c => {
+    if (!cardsByDeck.has(c.deck_id)) cardsByDeck.set(c.deck_id, []);
+    cardsByDeck.get(c.deck_id).push(c.id);
+  });
+
+  // 5. Calculate stats
+  const decksWithStats = decks.map(deck => {
+    const deckCardIds = cardsByDeck.get(deck.id) || [];
+    let mastered = 0;
+    let due = 0;
+
+    deckCardIds.forEach((cid: string) => {
+      const p = progressMap.get(cid);
+      if (p) {
+        if (p.status === 'mastered') mastered++;
+        else if (p.next_review && p.next_review <= now) due++;
+      }
+    });
+
+    const total = deckCardIds.length;
+    return {
+      ...deck,
+      count: total,
+      mastered,
+      due,
+      progress: total > 0 ? Math.round((mastered / total) * 100) : 0,
+    };
+  });
+
+  // 6. Parallel fetch remaining small items
+  const [lastExamRes, searchRes, bestCertRes] = await Promise.all([
+    supabase.from('edu_exam_results').select('radar_stats, score, created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    supabase.from('search_history').select('keyword').eq('user_id', userId).order('created_at', { ascending: false }).limit(5),
+    supabase.from('edu_exam_results').select('score, created_at').eq('user_id', userId).order('score', { ascending: false }).limit(1).maybeSingle()
+  ]);
 
   return {
     decks: decksWithStats,
-    lastExam: lastExam || null,
-    bestToxiCert: bestToxiCert || null,
-    recentSearches: (recentSearches || []).map(s => s.keyword),
+    lastExam: lastExamRes.data || null,
+    bestToxiCert: bestCertRes.data || null,
+    recentSearches: (searchRes.data || []).map(s => s.keyword),
   };
 }
 

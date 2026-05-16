@@ -31,6 +31,13 @@ export default function EduLayout() {
       const userEmail = session.user.email;
       setIsAdmin(userEmail === 'toxiloveyou@gmail.com');
 
+      // Check if role is already in session metadata to avoid extra query
+      const cachedRole = session.user.user_metadata?.role;
+      if (cachedRole) {
+        setUserRole(cachedRole);
+        return;
+      }
+
       const { data: profile } = await supabase
         .from('toxi_profiles')
         .select('role')
@@ -62,9 +69,11 @@ export default function EduLayout() {
       {/* Top Navigation */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-50 px-6 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <Link to="/edu/overview" className="flex items-center gap-2 text-[#2E3192] font-black text-xl">
-            <div className="w-8 h-8 bg-[#2E3192] rounded-lg flex items-center justify-center text-white">T</div>
-            Toxi<span className="text-orange-500">Edu</span>
+          <Link to="/edu/overview" className="flex items-center gap-2.5 text-[#2E3192] font-black text-xl group">
+            <div className="w-9 h-9 rounded-xl overflow-hidden shadow-lg shadow-indigo-500/10 group-hover:scale-105 transition-transform">
+              <img src="/assets/images/toxi_edu_logo.png" alt="TOXI EDU" className="w-full h-full object-cover" />
+            </div>
+            <span>Toxi<span className="text-orange-500">Edu</span></span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">

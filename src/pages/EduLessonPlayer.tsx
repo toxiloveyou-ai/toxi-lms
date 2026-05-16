@@ -428,7 +428,7 @@ export default function EduLessonPlayer() {
    return (
       <div className="flex h-screen bg-[#FDFDFF] text-slate-900 overflow-hidden font-sans selection:bg-indigo-100 relative">
          {/* Security Watermark */}
-         <div className="absolute z-[999] pointer-events-none opacity-[0.03] select-none text-[10px] font-black uppercase tracking-[0.5em] text-slate-900 whitespace-nowrap transition-all duration-1000" style={{ top: watermarkPos.top, left: watermarkPos.left }}>
+         <div className="absolute z-[999] pointer-events-none opacity-[0.03] select-none text-[10px] font-heading font-black uppercase tracking-[0.5em] text-slate-900 whitespace-nowrap transition-all duration-1000" style={{ top: watermarkPos.top, left: watermarkPos.left }}>
             Toxi Edu • {currentUser?.email} • {new Date().toLocaleDateString()}
          </div>
 
@@ -440,10 +440,10 @@ export default function EduLessonPlayer() {
             <div className="absolute inset-0 z-50 bg-white/80 backdrop-blur-xl flex items-center justify-center">
                <div className="flex flex-col items-center gap-4">
                   <div className="relative">
-                     <div className="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
-                     <Sparkles className="absolute inset-0 m-auto w-5 h-5 text-indigo-500 animate-pulse" />
+                     <div className="w-12 h-12 border-4 border-indigo-100 border-t-[#1A237E] rounded-full animate-spin"></div>
+                     <Sparkles className="absolute inset-0 m-auto w-5 h-5 text-[#1A237E] animate-pulse" />
                   </div>
-                  <p className="text-indigo-900 font-black text-[10px] uppercase tracking-[0.3em]">Toxi Edu is loading...</p>
+                  <p className="text-[#1A237E] font-heading font-black text-[10px] uppercase tracking-[0.3em]">Toxi Edu is loading...</p>
                </div>
             </div>
          )}
@@ -452,28 +452,28 @@ export default function EduLessonPlayer() {
          <aside className={`fixed inset-y-0 left-0 z-40 w-72 bg-white border-r border-slate-200/60 shadow-xl transition-transform duration-500 lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col shrink-0`}>
             <div className="p-5 border-b border-slate-100 space-y-4 shrink-0 relative overflow-hidden group">
                <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50/5 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform duration-700" />
-               <button onClick={() => navigate('/edu/dashboard')} className="flex items-center gap-2 text-[9px] font-black text-slate-400 hover:text-indigo-600 transition-all uppercase tracking-widest relative z-10">
+               <button onClick={() => navigate('/edu/dashboard')} className="flex items-center gap-2 text-[9px] font-heading font-black text-slate-400 hover:text-[#1A237E] transition-all uppercase tracking-widest relative z-10">
                   <ChevronLeft className="w-3.5 h-3.5" /> Quay lại Dashboard
                </button>
                <div className="relative z-10">
-                  <h2 className="text-base font-black tracking-tight leading-tight text-slate-800 mb-2 truncate">{lessons[0]?.courses?.title || 'Khóa học'}</h2>
+                  <h2 className="text-base font-heading font-black tracking-tight leading-tight text-slate-800 mb-2 truncate">{lessons[0]?.courses?.title || 'Khóa học'}</h2>
                   <div className="space-y-1.5">
-                     <div className="flex justify-between text-[8px] font-black text-slate-500 uppercase tracking-widest">
+                     <div className="flex justify-between text-[8px] font-heading font-black text-slate-500 uppercase tracking-widest">
                         <span>Tiến độ học tập</span>
-                        <span className="text-indigo-600">{lessons.length > 0 ? Math.round((Object.values(progressMap).filter((p: any) => p.status === 'completed').length / lessons.length) * 100) : 0}%</span>
+                        <span className="text-[#1A237E]">{lessons.length > 0 ? Math.round((Object.values(progressMap).filter((p: any) => p.status === 'completed').length / lessons.length) * 100) : 0}%</span>
                      </div>
                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden p-0.5">
-                        <div className="h-full bg-gradient-to-r from-indigo-500 to-indigo-700 rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(79,70,229,0.4)]" style={{ width: `${lessons.length > 0 ? Math.round((Object.values(progressMap).filter((p: any) => p.status === 'completed').length / lessons.length) * 100) : 0}%` }} />
+                        <div className="h-full bg-gradient-to-r from-[#1A237E] to-[#000051] rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(26,35,126,0.4)]" style={{ width: `${lessons.length > 0 ? Math.round((Object.values(progressMap).filter((p: any) => p.status === 'completed').length / lessons.length) * 100) : 0}%` }} />
                      </div>
                   </div>
                </div>
             </div>
 
             <div className="px-5 py-3 bg-slate-50/50 flex items-center justify-between border-b border-slate-100">
-               <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Nội dung bài giảng</span>
+               <span className="text-[8px] font-heading font-black text-slate-400 uppercase tracking-widest">Nội dung bài giảng</span>
                <div className="flex items-center gap-1">
                   <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                  <span className="text-[7px] font-black text-emerald-600 uppercase">Live Update</span>
+                  <span className="text-[7px] font-heading font-black text-emerald-600 uppercase">Live Update</span>
                </div>
             </div>
 
@@ -483,9 +483,6 @@ export default function EduLessonPlayer() {
                   const isCompleted = prog?.status === 'completed';
                   const isActive = activeLesson?.id === lesson.id;
 
-                  // Sequential locking logic:
-                  // A lesson is locked if the previous lesson is not completed.
-                  // Exception: The very first lesson is always unlocked.
                   const prevLessonId = idx > 0 ? lessons[idx - 1].id : null;
                   const isLocked = idx > 0 && progressMap[prevLessonId!]?.status !== 'completed';
 
@@ -500,18 +497,18 @@ export default function EduLessonPlayer() {
                               navigate(`/edu/course/${courseId}/lesson/${lesson.id}`);
                            }
                         }}
-                        className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all border group/item ${isActive ? 'bg-indigo-50/50 text-indigo-900 border-indigo-100 shadow-sm' :
+                        className={`w-full flex items-center gap-3 p-3 clip-diagonal transition-all border group/item ${isActive ? 'bg-indigo-50/50 text-indigo-950 border-indigo-100 shadow-sm' :
                               isLocked ? 'opacity-40 grayscale cursor-not-allowed border-transparent' :
                                  'text-slate-500 hover:bg-slate-50 border-transparent'
                            }`}>
-                        <div className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-[8px] font-black shadow-sm transition-transform group-hover/item:scale-110 ${isActive ? 'bg-indigo-600 text-white' :
+                        <div className={`w-7 h-7 clip-diagonal flex items-center justify-center shrink-0 text-[8px] font-heading font-black shadow-sm transition-transform group-hover/item:scale-110 ${isActive ? 'bg-[#1A237E] text-white' :
                               isCompleted ? 'bg-emerald-500 text-white' :
                                  isLocked ? 'bg-slate-200 text-slate-400' : 'bg-slate-100 text-slate-400'
                            }`}>
                            {isCompleted ? <CheckCircle2 className="w-3.5 h-3.5" /> : isLocked ? <Shield className="w-3.5 h-3.5" /> : idx + 1}
                         </div>
                         <div className="text-left flex-1 min-w-0">
-                           <p className={`text-[10px] font-black leading-tight truncate ${isActive ? 'text-indigo-950' : 'text-slate-700'}`}>{lesson.title}</p>
+                           <p className={`text-[10px] font-heading font-black leading-tight truncate ${isActive ? 'text-indigo-950' : 'text-slate-700'}`}>{lesson.title}</p>
                            <div className="flex items-center gap-2 text-[7px] font-bold uppercase tracking-widest opacity-40">
                               {isLocked ? (
                                  <span className="flex items-center gap-1 text-slate-400"><Shield className="w-2.5 h-2.5" /> Hoàn thành bài trước để mở</span>
@@ -529,17 +526,17 @@ export default function EduLessonPlayer() {
             </div>
 
             <div className="p-4 bg-white border-t border-slate-100 shrink-0 space-y-3">
-               <div className="p-4 bg-indigo-50/30 rounded-2xl border border-indigo-100/50 space-y-2">
-                  <p className="text-[8px] font-black text-indigo-900 uppercase tracking-widest flex items-center gap-2">
+               <div className="p-4 bg-indigo-50/30 clip-diagonal border border-indigo-100/50 space-y-2">
+                  <p className="text-[8px] font-heading font-black text-[#1A237E] uppercase tracking-widest flex items-center gap-2">
                      <FileDown className="w-3 h-3" /> Tài liệu Offline
                   </p>
                   <p className="text-[7px] text-slate-500 font-medium leading-tight">Tải PDF & Audio để học bất cứ lúc nào không cần mạng.</p>
-                  <button className="w-full py-2 bg-white text-indigo-600 rounded-lg font-black text-[8px] uppercase tracking-widest border border-indigo-100 shadow-sm hover:bg-indigo-600 hover:text-white transition-all">
+                  <button className="w-full py-2 bg-white text-[#1A237E] clip-diagonal font-heading font-black text-[8px] uppercase tracking-widest border border-indigo-100 shadow-sm hover:bg-[#1A237E] hover:text-white transition-all">
                      Tải về trọn bộ (.zip)
                   </button>
                </div>
-               <button className="w-full py-3 bg-slate-900 text-white rounded-xl font-black text-[9px] uppercase tracking-widest shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
-                  <HelpCircle className="w-3.5 h-3.5 text-orange-400" /> Hỗ trợ học viên
+               <button className="w-full py-3 bg-slate-900 text-white clip-diagonal font-heading font-black text-[9px] uppercase tracking-widest shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
+                  <HelpCircle className="w-3.5 h-3.5 text-[#FF9800]" /> Hỗ trợ học viên
                </button>
             </div>
          </aside>
@@ -548,24 +545,24 @@ export default function EduLessonPlayer() {
          <main className="flex-1 relative flex flex-col min-w-0">
             <header className="h-14 border-b border-slate-200/50 px-6 flex items-center justify-between bg-white/70 backdrop-blur-xl z-20 shrink-0 shadow-sm">
                <div className="flex items-center gap-4">
-                  <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="w-9 h-9 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-indigo-600 shadow-sm active:scale-95 transition-all">
+                  <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="w-9 h-9 flex items-center justify-center bg-white border border-slate-200 clip-diagonal text-slate-400 hover:text-[#1A237E] shadow-sm active:scale-95 transition-all">
                      <Menu className="w-4.5 h-4.5" />
                   </button>
                   <div className="h-6 w-px bg-slate-200/50 hidden md:block" />
-                  <h1 className="text-xs font-black text-slate-800 tracking-tight truncate max-w-[300px]">
+                  <h1 className="text-xs font-heading font-black text-slate-800 tracking-tight truncate max-w-[300px]">
                      {activeLesson?.title || 'Đang tải bài học...'}
                   </h1>
                </div>
 
-               <div className="hidden xl:flex items-center gap-1 bg-slate-100/50 p-1 rounded-xl border border-slate-200/40">
+               <div className="hidden xl:flex items-center gap-1 bg-slate-100/50 p-1 clip-diagonal border border-slate-200/40">
                   {([
-                     { id: 'zone1', label: 'Định hướng', icon: BookOpen, color: 'text-orange-500' },
+                     { id: 'zone1', label: 'Định hướng', icon: BookOpen, color: 'text-[#FF9800]' },
                      { id: 'zone2', label: 'Bài học', icon: Target, color: 'text-emerald-500' },
                      { id: 'zone3', label: 'Cộng đồng', icon: Users, color: 'text-blue-500' },
-                     { id: 'zone4', label: 'AI Mentor', icon: Sparkles, color: 'text-purple-500' },
+                     { id: 'zone4', label: 'AI Mentor', icon: Sparkles, color: 'text-[#1A237E]' },
                   ] as const).map(z => (
                      <button key={z.id} onClick={() => setActiveZone(z.id)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all ${activeZone === z.id ? 'bg-white text-slate-900 shadow-sm scale-105' : 'text-slate-400 hover:text-slate-600'}`}>
+                        className={`flex items-center gap-1.5 px-3 py-1.5 clip-diagonal text-[8px] font-heading font-black uppercase tracking-widest transition-all ${activeZone === z.id ? 'bg-white text-slate-900 shadow-sm scale-105' : 'text-slate-400 hover:text-slate-600'}`}>
                         <z.icon className={`w-3 h-3 ${activeZone === z.id ? z.color : ''}`} />
                         <span className="hidden 2xl:block">{z.label}</span>
                      </button>
@@ -573,15 +570,15 @@ export default function EduLessonPlayer() {
                </div>
 
                <div className="flex items-center gap-3">
-                  <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-indigo-50 to-white rounded-xl border border-indigo-100 shadow-sm group">
-                     <div key={earnedXP} className="w-6 h-6 bg-indigo-600 rounded-md flex items-center justify-center shadow-lg shadow-indigo-600/30 group-hover:rotate-12 transition-transform animate-in zoom-in duration-300">
-                        <Zap className="w-3 h-3 text-white" />
+                  <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-indigo-50 to-white clip-diagonal border border-indigo-100 shadow-sm group">
+                     <div key={earnedXP} className="w-6 h-6 bg-[#1A237E] clip-diagonal flex items-center justify-center shadow-lg shadow-indigo-600/30 group-hover:rotate-12 transition-transform animate-in zoom-in duration-300">
+                        <Zap className="w-3 h-3 text-[#FF9800]" />
                      </div>
                      <div className="flex flex-col">
-                        <span className="text-[9px] font-black text-indigo-900 tabular-nums">{earnedXP || 0} XP</span>
+                        <span className="text-[9px] font-heading font-black text-indigo-900 tabular-nums">{earnedXP || 0} XP</span>
                      </div>
                   </div>
-                  <button className="w-9 h-9 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-indigo-600 shadow-sm"><Settings className="w-4.5 h-4.5" /></button>
+                  <button className="w-9 h-9 flex items-center justify-center bg-white border border-slate-200 clip-diagonal text-slate-400 hover:text-[#1A237E] shadow-sm"><Settings className="w-4.5 h-4.5" /></button>
                </div>
             </header>
 
@@ -594,19 +591,19 @@ export default function EduLessonPlayer() {
                         {/* ZONE 1: ĐỊNH HƯỚNG */}
                         {activeZone === 'zone1' && (
                            <div className="animate-in fade-in slide-in-from-bottom-6 duration-700 space-y-4">
-                              <div className="bg-white/90 backdrop-blur-xl rounded-[2rem] p-6 border border-white shadow-sm group overflow-hidden">
-                                 <h2 className="text-sm font-black text-slate-900 flex items-center gap-3 mb-4">
-                                    <BookOpen className="w-8 h-8 text-indigo-600 p-2 bg-indigo-50 rounded-xl" /> Từ vựng cốt lõi
+                              <div className="bg-white/90 backdrop-blur-xl clip-diagonal p-6 border border-white shadow-sm group overflow-hidden">
+                                 <h2 className="text-sm font-heading font-black text-slate-900 flex items-center gap-3 mb-4">
+                                    <BookOpen className="w-8 h-8 text-[#1A237E] p-2 bg-indigo-50 clip-diagonal" /> Từ vựng cốt lõi
                                  </h2>
                                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                                     {(activeLesson?.content_json?.vocabulary || []).map((v: any, i: number) => (
-                                       <div key={i} className="bg-white p-4 rounded-2xl border border-slate-100 hover:border-indigo-400 hover:shadow-md transition-all duration-500 group/card relative overflow-hidden flex flex-col items-center">
+                                       <div key={i} className="bg-white p-4 clip-diagonal border border-slate-100 hover:border-indigo-400 hover:shadow-md transition-all duration-500 group/card relative overflow-hidden flex flex-col items-center">
                                           <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/0 to-indigo-50/50 opacity-0 group-hover/card:opacity-100 transition-opacity" />
                                           <div className="relative z-10 flex flex-col items-center text-center">
-                                             <div className="text-2xl font-black text-slate-900 mb-1">{v.hanzi}</div>
-                                             <div className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-lg text-[7px] font-black uppercase tracking-widest mb-1">{v.pinyin}</div>
-                                             <div className="text-[9px] font-bold text-orange-500 uppercase tracking-wide mb-3">{v.meaning}</div>
-                                             <button className="w-7 h-7 bg-slate-50 hover:bg-indigo-600 text-slate-400 hover:text-white rounded-lg flex items-center justify-center transition-all shadow-sm"
+                                             <div className="text-2xl font-heading font-black text-slate-900 mb-1">{v.hanzi}</div>
+                                             <div className="px-2 py-0.5 bg-indigo-50 text-[#1A237E] clip-diagonal text-[7px] font-heading font-black uppercase tracking-widest mb-1">{v.pinyin}</div>
+                                             <div className="text-[9px] font-bold text-[#FF9800] uppercase tracking-wide mb-3">{v.meaning}</div>
+                                             <button className="w-7 h-7 bg-slate-50 hover:bg-[#1A237E] text-slate-400 hover:text-white clip-diagonal flex items-center justify-center transition-all shadow-sm"
                                                 onClick={() => { const u = new SpeechSynthesisUtterance(v.hanzi); u.lang = 'zh-CN'; u.rate = 0.8; speechSynthesis.speak(u); }}>
                                                 <Volume2 className="w-3.5 h-3.5" />
                                              </button>
@@ -616,14 +613,14 @@ export default function EduLessonPlayer() {
                                  </div>
                               </div>
 
-                              <div className="bg-white/90 backdrop-blur-xl rounded-[2rem] p-6 border border-white shadow-sm">
-                                 <h2 className="text-sm font-black text-slate-900 flex items-center gap-3 mb-4">
-                                    <Target className="w-8 h-8 text-emerald-500 p-2 bg-emerald-50 rounded-xl" /> Mục tiêu bài học
+                              <div className="bg-white/90 backdrop-blur-xl clip-diagonal p-6 border border-white shadow-sm">
+                                 <h2 className="text-sm font-heading font-black text-slate-900 flex items-center gap-3 mb-4">
+                                    <Target className="w-8 h-8 text-emerald-500 p-2 bg-emerald-50 clip-diagonal" /> Mục tiêu bài học
                                  </h2>
                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {(activeLesson?.content_json?.outcomes || []).map((out: string, i: number) => (
-                                       <div key={i} className="flex items-center gap-3 p-3 bg-slate-50/50 border border-slate-100 rounded-2xl hover:bg-white transition-all group/out">
-                                          <div className="w-6 h-6 bg-emerald-500 text-white rounded-lg flex items-center justify-center shadow-lg group-hover/out:scale-110 transition-transform">
+                                       <div key={i} className="flex items-center gap-3 p-3 bg-slate-50/50 border border-slate-100 clip-diagonal hover:bg-white transition-all group/out">
+                                          <div className="w-6 h-6 bg-emerald-500 text-white clip-diagonal flex items-center justify-center shadow-lg group-hover/out:scale-110 transition-transform">
                                              <Check className="w-3.5 h-3.5 stroke-[4]" />
                                           </div>
                                           <p className="text-slate-700 font-bold text-[10px]">{out}</p>
@@ -638,7 +635,7 @@ export default function EduLessonPlayer() {
                         {activeZone === 'zone2' && (
                            <div className="animate-in fade-in slide-in-from-bottom-6 duration-700 space-y-6">
                               {activeLesson.content_type === 'video' && (
-                                 <div className="relative aspect-video bg-black rounded-[2rem] overflow-hidden shadow-2xl border-[6px] border-white group">
+                                 <div className="relative aspect-video bg-black clip-diagonal overflow-hidden shadow-2xl border-[6px] border-white group">
                                     <iframe
                                        src={activeLesson.content_url}
                                        className="w-full h-full"
@@ -649,19 +646,19 @@ export default function EduLessonPlayer() {
                               )}
 
                               {activeLesson.content_type === 'pdf' && (
-                                 <div className="bg-white rounded-[2rem] p-1 border border-slate-200 shadow-xl h-[550px]">
-                                    <iframe src={activeLesson.content_url} className="w-full h-full rounded-[1.8rem]" />
+                                 <div className="bg-white clip-diagonal p-1 border border-slate-200 shadow-xl h-[550px]">
+                                    <iframe src={activeLesson.content_url} className="w-full h-full clip-diagonal" />
                                  </div>
                               )}
 
-                              <div className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] p-6 border border-white shadow-sm">
-                                 <div className="flex items-center gap-1 bg-slate-100/50 p-1 rounded-xl mb-6 w-fit mx-auto border border-slate-200/30">
+                              <div className="bg-white/80 backdrop-blur-2xl clip-diagonal p-6 border border-white shadow-sm">
+                                 <div className="flex items-center gap-1 bg-slate-100/50 p-1 clip-diagonal mb-6 w-fit mx-auto border border-slate-200/30">
                                     {(['understand', 'practice', 'apply'] as const).map(tab => (
                                        <button key={tab} onClick={() => {
                                           setActiveTab(tab);
                                           updatePhaseProgress(tab);
                                        }}
-                                          className={`px-8 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-[#2E3192] text-white shadow-lg scale-105' : 'text-slate-400 hover:text-slate-600'}`}>
+                                          className={`px-8 py-2 clip-diagonal text-[9px] font-heading font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-[#1A237E] text-white shadow-lg scale-105' : 'text-slate-400 hover:text-slate-600'}`}>
                                           {tab === 'understand' ? 'Thấu hiểu' : tab === 'practice' ? 'Rèn luyện' : 'Ứng dụng'}
                                        </button>
                                     ))}
@@ -671,22 +668,22 @@ export default function EduLessonPlayer() {
                                  {activeTab === 'understand' && (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
                                        {/* Teacher's Master Insight Section */}
-                                       <div className="p-8 bg-gradient-to-br from-[#1e293b] to-[#0f172a] rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden group mb-8">
+                                       <div className="p-8 bg-gradient-to-br from-[#1A237E] to-[#000051] clip-diagonal text-white shadow-2xl relative overflow-hidden group mb-8">
                                           <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:rotate-12 transition-transform duration-700">
                                              <GraduationCap className="w-32 h-32" />
                                           </div>
                                           <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-                                             <div className="w-20 h-20 bg-indigo-500 rounded-3xl flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/20">
+                                             <div className="w-20 h-20 bg-[#FF9800] clip-diagonal flex items-center justify-center shrink-0 shadow-lg shadow-orange-500/20">
                                                 <Sparkles className="w-10 h-10" />
                                              </div>
                                              <div className="space-y-3">
-                                                <h4 className="text-xs font-black text-indigo-400 uppercase tracking-widest">Lời khuyên từ Giảng viên</h4>
+                                                <h4 className="text-xs font-heading font-black text-orange-200 uppercase tracking-widest">Lời khuyên từ Giảng viên</h4>
                                                 <p className="text-base font-bold leading-relaxed text-slate-200">
                                                    "{activeLesson?.teacher_notes || 'Để nắm vững bài này, bạn cần chú ý kỹ cách phát âm bộ thủ \"Mộc\" và sự thay đổi ý nghĩa khi kết hợp với các từ chỉ phương hướng.'}"
                                                 </p>
-                                                <div className="flex items-center gap-4 text-[10px] font-black text-slate-500 uppercase tracking-widest pt-2">
-                                                   <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> Đã kiểm duyệt nội dung</span>
-                                                   <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5 text-blue-500" /> 1.2k học viên đã xem</span>
+                                                <div className="flex items-center gap-4 text-[10px] font-heading font-black text-indigo-200 uppercase tracking-widest pt-2">
+                                                   <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Đã kiểm duyệt nội dung</span>
+                                                   <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5 text-blue-400" /> 1.2k học viên đã xem</span>
                                                 </div>
                                              </div>
                                           </div>
@@ -695,30 +692,30 @@ export default function EduLessonPlayer() {
                                        {(activeLesson?.content_json?.key_sentences || [
                                           { zh: '你好！今天的生产任务完成了吗？', vi: 'Chào bạn! Nhiệm vụ sản xuất hôm nay đã hoàn thành chưa?', pinyin: 'Nǐ hǎo! Jīntiān de shēngchǎn rènwu wánchéng le ma?', explanation: 'Mẫu câu hỏi tiến độ sản xuất cơ bản.' }
                                        ]).map((s: any, idx: number) => (
-                                          <section key={idx} className="p-6 bg-gradient-to-br from-indigo-50 to-white rounded-[2rem] border border-indigo-100 relative group overflow-hidden">
-                                             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000" />
+                                          <section key={idx} className="p-6 bg-gradient-to-br from-indigo-50 to-white clip-diagonal border border-indigo-100 relative group overflow-hidden">
+                                             <div className="absolute top-0 right-0 w-32 h-32 bg-[#1A237E]/5 rounded-full blur-2xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000" />
                                              <div className="flex flex-col md:flex-row gap-6 items-center relative z-10">
                                                 <div className="flex-1 space-y-3">
-                                                   <span className="px-2 py-0.5 bg-indigo-600 text-white text-[7px] font-black uppercase tracking-widest rounded shadow-md">Mẫu câu trọng tâm #{idx + 1}</span>
-                                                   <h3 className="text-2xl font-black text-slate-800 leading-tight">{s.zh}</h3>
+                                                   <span className="px-2 py-0.5 bg-[#1A237E] text-white text-[7px] font-heading font-black uppercase tracking-widest rounded shadow-md">Mẫu câu trọng tâm #{idx + 1}</span>
+                                                   <h3 className="text-2xl font-heading font-black text-slate-800 leading-tight">{s.zh}</h3>
                                                    <p className="text-sm font-bold text-slate-400 italic">{s.pinyin}</p>
-                                                   <div className="p-3 bg-white/60 backdrop-blur-sm rounded-xl border border-indigo-50 shadow-sm">
-                                                      <p className="text-[11px] font-black text-indigo-900">{s.vi}</p>
+                                                   <div className="p-3 bg-white/60 backdrop-blur-sm clip-diagonal border border-indigo-50 shadow-sm">
+                                                      <p className="text-[11px] font-heading font-black text-indigo-900">{s.vi}</p>
                                                    </div>
                                                    <div className="flex gap-2 pt-2">
-                                                      <button className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-lg font-black text-[9px] hover:bg-indigo-700 transition-all shadow-md group/btn"
+                                                      <button className="flex items-center gap-1.5 px-4 py-2 bg-[#1A237E] text-white clip-diagonal-hover font-heading font-black text-[9px] hover:bg-[#000051] transition-all shadow-md group/btn"
                                                          onClick={() => { const u = new SpeechSynthesisUtterance(s.zh); u.lang = 'zh-CN'; u.rate = 0.8; speechSynthesis.speak(u); }}>
                                                          <Volume2 className="w-3.5 h-3.5 group-hover/btn:scale-110" /> Nghe AI đọc
                                                       </button>
                                                    </div>
                                                 </div>
                                                 {s.explanation && (
-                                                   <div className="w-full md:w-64 bg-white/80 p-4 rounded-2xl border border-slate-100 shadow-sm">
-                                                      <h4 className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                                                         <Info className="w-3 h-3" /> Giải thích ngữ pháp
+                                                   <div className="w-full md:w-64 bg-white/80 p-4 clip-diagonal border border-slate-100 shadow-sm">
+                                                      <h4 className="text-[8px] font-heading font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                                                         <Info className="w-3 h-3 text-[#FF9800]" /> Giải thích ngữ pháp
                                                       </h4>
                                                       <div className="space-y-3">
-                                                         <div className="p-2.5 bg-indigo-50/50 rounded-xl border border-indigo-100/50">
+                                                         <div className="p-2.5 bg-indigo-50/50 clip-diagonal border border-indigo-100/50">
                                                             <p className="text-[10px] text-slate-600 font-medium leading-relaxed italic">{s.explanation}</p>
                                                          </div>
                                                       </div>
@@ -733,17 +730,17 @@ export default function EduLessonPlayer() {
                                  {/* 2. RÈN LUYỆN */}
                                  {activeTab === 'practice' && (
                                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-                                       <div className="bg-slate-50/50 rounded-[2rem] p-8 border border-slate-200 relative overflow-hidden shadow-inner">
+                                       <div className="bg-slate-50/50 clip-diagonal p-8 border border-slate-200 relative overflow-hidden shadow-inner">
                                           <div className="flex items-center justify-between mb-6">
                                              <div className="flex flex-col">
-                                                <span className="px-3 py-1 bg-orange-100 text-orange-600 text-[8px] font-black uppercase rounded-lg mb-2 w-fit">
+                                                <span className="px-3 py-1 bg-orange-100 text-[#FF9800] text-[8px] font-heading font-black uppercase clip-diagonal mb-2 w-fit">
                                                    Thử thách {currentExIdx + 1}/{(activeLesson?.content_json?.practice || PRACTICE_EXERCISES).length}
                                                 </span>
-                                                <h3 className="text-lg font-black text-slate-800 leading-snug">{ex.question}</h3>
+                                                <h3 className="text-lg font-heading font-black text-slate-800 leading-snug">{ex.question}</h3>
                                              </div>
                                              <div className="hidden md:flex gap-1.5">
                                                 {(activeLesson?.content_json?.practice || PRACTICE_EXERCISES).map((_: any, idx: number) => (
-                                                   <div key={idx} className={`h-1.5 rounded-full transition-all ${idx === currentExIdx ? 'w-8 bg-orange-500' : idx < currentExIdx ? 'w-1.5 bg-emerald-500' : 'w-1.5 bg-slate-200'}`} />
+                                                   <div key={idx} className={`h-1.5 rounded-full transition-all ${idx === currentExIdx ? 'w-8 bg-[#FF9800]' : idx < currentExIdx ? 'w-1.5 bg-emerald-500' : 'w-1.5 bg-slate-200'}`} />
                                                 ))}
                                              </div>
                                           </div>
@@ -756,13 +753,13 @@ export default function EduLessonPlayer() {
                                                    if (showExplain) {
                                                       style = isCorrectAns ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-md' : selectedOpt === idx ? 'border-red-500 bg-red-50 text-red-700' : 'opacity-40 border-slate-100';
                                                    } else if (selectedOpt === idx) {
-                                                      style = 'border-indigo-600 bg-indigo-50 text-indigo-900 shadow-md';
+                                                      style = 'border-[#1A237E] bg-indigo-50 text-[#1A237E] shadow-md';
                                                    }
                                                    return (
-                                                      <button key={idx} onClick={() => !showExplain && setSelectedOpt(idx)} disabled={showExplain} className={`p-5 rounded-2xl border-2 text-left font-black transition-all ${style} group/opt`}>
+                                                      <button key={idx} onClick={() => !showExplain && setSelectedOpt(idx)} disabled={showExplain} className={`p-5 clip-diagonal border border-2 text-left font-heading font-black transition-all ${style} group/opt`}>
                                                          <div className="flex items-center gap-4">
-                                                            <div className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 ${showExplain && isCorrectAns ? 'bg-emerald-500 border-emerald-500 text-white' : selectedOpt === idx ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-200 text-slate-300'}`}>
-                                                               {showExplain && isCorrectAns ? <Check className="w-4 h-4 stroke-[4]" /> : <span className="text-[10px] font-black">{String.fromCharCode(65 + idx)}</span>}
+                                                            <div className={`w-8 h-8 clip-diagonal border flex items-center justify-center shrink-0 ${showExplain && isCorrectAns ? 'bg-emerald-500 border-emerald-500 text-white' : selectedOpt === idx ? 'bg-[#1A237E] border-[#1A237E] text-white' : 'border-slate-200 text-slate-300'}`}>
+                                                               {showExplain && isCorrectAns ? <Check className="w-4 h-4 stroke-[4]" /> : <span className="text-[10px] font-heading font-black">{String.fromCharCode(65 + idx)}</span>}
                                                             </div>
                                                             <span className="text-[13px]">{opt}</span>
                                                          </div>
@@ -774,15 +771,15 @@ export default function EduLessonPlayer() {
 
                                           {ex.type === 'order_sentence' && (
                                              <div className="space-y-4 mb-6">
-                                                <div className="min-h-[5rem] p-6 rounded-2xl border-2 border-dashed border-slate-200 bg-white/80 flex flex-wrap gap-2 items-center justify-center shadow-inner">
-                                                   {orderedWords.length === 0 && <span className="text-slate-300 font-black text-[9px] uppercase tracking-widest">Bấm chọn các từ bên dưới</span>}
+                                                <div className="min-h-[5rem] p-6 clip-diagonal border-2 border-dashed border-slate-200 bg-white/80 flex flex-wrap gap-2 items-center justify-center shadow-inner">
+                                                   {orderedWords.length === 0 && <span className="text-slate-300 font-heading font-black text-[9px] uppercase tracking-widest">Bấm chọn các từ bên dưới</span>}
                                                    {orderedWords.map((word, idx) => (
-                                                      <button key={idx} onClick={() => handleWordSelect(word, false)} disabled={showExplain} className="px-4 py-2 bg-indigo-600 text-white font-black rounded-xl shadow-md hover:scale-105 transition-all text-sm">{word}</button>
+                                                      <button key={idx} onClick={() => handleWordSelect(word, false)} disabled={showExplain} className="px-4 py-2 bg-[#1A237E] text-white font-heading font-black clip-diagonal shadow-md hover:scale-105 transition-all text-sm">{word}</button>
                                                    ))}
                                                 </div>
                                                 <div className="flex flex-wrap gap-2 justify-center">
                                                    {availableWords.map((word, idx) => (
-                                                      <button key={idx} onClick={() => handleWordSelect(word, true)} disabled={showExplain} className="px-4 py-2 bg-white border border-slate-200 text-slate-800 font-black rounded-xl hover:border-indigo-600 hover:text-indigo-600 transition-all text-sm shadow-sm">{word}</button>
+                                                      <button key={idx} onClick={() => handleWordSelect(word, true)} disabled={showExplain} className="px-4 py-2 bg-white border border-slate-200 text-slate-800 font-heading font-black clip-diagonal hover:border-[#1A237E] hover:text-[#1A237E] transition-all text-sm shadow-sm">{word}</button>
                                                    ))}
                                                 </div>
                                              </div>
@@ -790,18 +787,18 @@ export default function EduLessonPlayer() {
 
                                           {ex.type === 'translate' && (
                                              <div className="space-y-4 mb-6">
-                                                <div className="p-5 bg-white rounded-2xl border-2 border-slate-100 shadow-sm">
-                                                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                                      <Sparkles className="w-3.5 h-3.5 text-indigo-500" /> Gợi ý từ vựng:
+                                                <div className="p-5 bg-white clip-diagonal border-2 border-slate-100 shadow-sm">
+                                                   <p className="text-[10px] font-heading font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                                      <Sparkles className="w-3.5 h-3.5 text-[#1A237E]" /> Gợi ý từ vựng:
                                                    </p>
                                                    <div className="flex flex-wrap gap-2">
                                                       {(ex.hints || []).map((hint: string, i: number) => (
-                                                         <span key={i} className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[9px] font-black border border-indigo-100 shadow-sm">{hint}</span>
+                                                         <span key={i} className="px-3 py-1 bg-indigo-50 text-[#1A237E] clip-diagonal text-[9px] font-heading font-black border border-indigo-100 shadow-sm">{hint}</span>
                                                       ))}
                                                    </div>
                                                 </div>
                                                 <textarea
-                                                   className="w-full p-5 bg-white border-2 border-slate-200 rounded-2xl text-base font-black min-h-[120px] focus:border-indigo-600 outline-none shadow-sm transition-all"
+                                                   className="w-full p-5 bg-white border border-2 border-slate-200 clip-diagonal text-base font-heading font-black min-h-[120px] focus:border-[#1A237E] outline-none shadow-sm transition-all"
                                                    placeholder="Nhập bản dịch của bạn ở đây..."
                                                    value={translateText}
                                                    onChange={(e) => setTranslateText(e.target.value)}
@@ -812,19 +809,19 @@ export default function EduLessonPlayer() {
 
                                           {showExplain ? (
                                              <div className="animate-in fade-in slide-in-from-top-2">
-                                                <div className="p-4 bg-indigo-50 rounded-xl border border-indigo-100/50 mb-6 flex items-start gap-3 shadow-sm">
-                                                   <Info className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
+                                                <div className="p-4 bg-indigo-50 clip-diagonal border border-indigo-100/50 mb-6 flex items-start gap-3 shadow-sm">
+                                                   <Info className="w-5 h-5 text-[#1A237E] shrink-0 mt-0.5" />
                                                    <div>
-                                                      <p className="text-[8px] font-black text-indigo-400 uppercase tracking-widest mb-1">Giải thích từ chuyên gia</p>
+                                                      <p className="text-[8px] font-heading font-black text-indigo-400 uppercase tracking-widest mb-1">Giải thích từ chuyên gia</p>
                                                       <p className="text-[11px] font-bold text-slate-700 leading-relaxed">{ex.explain}</p>
                                                    </div>
                                                 </div>
-                                                <button onClick={nextPractice} className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 group shadow-xl">
+                                                <button onClick={nextPractice} className="w-full py-4 bg-[#1A237E] text-white clip-diagonal-hover font-heading font-black text-xs uppercase tracking-widest hover:bg-[#000051] transition-all flex items-center justify-center gap-2 group shadow-xl">
                                                    {currentExIdx < (activeLesson?.content_json?.practice || PRACTICE_EXERCISES).length - 1 ? 'Tiếp tục rèn luyện' : 'Chuyển sang thực chiến'} <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                                 </button>
                                              </div>
                                           ) : (
-                                             <button onClick={checkPracticeAnswer} disabled={!isPracticeAnswerReady()} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest mt-4 shadow-lg disabled:opacity-20 hover:bg-black transition-all">Kiểm tra đáp án</button>
+                                             <button onClick={checkPracticeAnswer} disabled={!isPracticeAnswerReady()} className="w-full py-4 bg-slate-900 text-white clip-diagonal-hover font-heading font-black text-xs uppercase tracking-widest mt-4 shadow-lg disabled:opacity-20 hover:bg-black transition-all">Kiểm tra đáp án</button>
                                           )}
                                        </div>
                                     </div>
@@ -835,13 +832,13 @@ export default function EduLessonPlayer() {
                                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
                                        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
                                           <div className="md:col-span-8 space-y-6">
-                                             <div className="bg-slate-50 rounded-[2.5rem] p-10 border border-slate-200 shadow-inner space-y-8">
+                                             <div className="bg-slate-50 clip-diagonal p-10 border border-slate-200 shadow-inner space-y-8">
                                                 <div className="flex flex-col gap-4">
-                                                   <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-slate-100">
-                                                      <AudioLines className="w-8 h-8 text-indigo-600" />
+                                                   <div className="w-16 h-16 bg-white clip-diagonal flex items-center justify-center shadow-sm border border-slate-100">
+                                                      <AudioLines className="w-8 h-8 text-[#1A237E]" />
                                                    </div>
                                                    <div className="space-y-2">
-                                                      <h3 className="text-xl font-black text-slate-800 tracking-tight">Thực hành & Nộp bài tập</h3>
+                                                      <h3 className="text-xl font-heading font-black text-slate-800 tracking-tight">Thực hành & Nộp bài tập</h3>
                                                       <p className="text-sm font-medium text-slate-500 leading-relaxed">
                                                          Hãy viết lại các từ vựng đã học hôm nay hoặc trả lời câu hỏi bài tập của giáo viên vào ô bên dưới. AI sẽ giúp bạn chấm điểm và sửa lỗi ngay lập tức.
                                                       </p>
@@ -854,12 +851,12 @@ export default function EduLessonPlayer() {
                                                       value={homeworkContent}
                                                       onChange={(e) => setHomeworkContent(e.target.value)}
                                                       placeholder="Nhập nội dung bài tập của bạn ở đây..."
-                                                      className="w-full p-6 bg-white border-2 border-slate-100 rounded-[2rem] text-sm font-medium focus:border-indigo-600 outline-none shadow-sm min-h-[200px] transition-all"
+                                                      className="w-full p-6 bg-white border-2 border-slate-100 clip-diagonal text-sm font-medium focus:border-[#1A237E] outline-none shadow-sm min-h-[200px] transition-all"
                                                    />
                                                    <button
                                                       onClick={handleSubmitHomework}
                                                       disabled={!homeworkContent.trim() || submittingHomework}
-                                                      className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-30"
+                                                      className="w-full py-4 bg-[#1A237E] text-white clip-diagonal-hover font-heading font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-30"
                                                    >
                                                       {submittingHomework ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Nộp bài ngay'}
                                                    </button>
@@ -868,22 +865,22 @@ export default function EduLessonPlayer() {
                                                 {/* Submission History */}
                                                 {mySubmissions.length > 0 && (
                                                    <div className="space-y-4 pt-6 border-t border-slate-200">
-                                                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Lịch sử bài nộp</p>
+                                                      <p className="text-[10px] font-heading font-black text-slate-400 uppercase tracking-widest">Lịch sử bài nộp</p>
                                                       {mySubmissions.map((sub: any, i: number) => (
-                                                         <div key={i} className="p-6 bg-white rounded-3xl border border-slate-100 space-y-4 shadow-sm">
+                                                         <div key={i} className="p-6 bg-white clip-diagonal border border-slate-100 space-y-4 shadow-sm">
                                                             <div className="flex items-center justify-between">
-                                                               <span className="text-[8px] font-black text-slate-400 uppercase">{new Date(sub.submitted_at).toLocaleString()}</span>
+                                                               <span className="text-[8px] font-heading font-black text-slate-400 uppercase">{new Date(sub.submitted_at).toLocaleString()}</span>
                                                                {sub.ai_score && (
                                                                   <div className="flex items-center gap-2">
-                                                                     <span className="text-[10px] font-black text-emerald-600 uppercase">AI Score: {sub.ai_score}/100</span>
+                                                                     <span className="text-[10px] font-heading font-black text-emerald-600 uppercase">AI Score: {sub.ai_score}/100</span>
                                                                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
                                                                   </div>
                                                                )}
                                                             </div>
                                                             <p className="text-xs text-slate-700 font-medium leading-relaxed">{sub.content}</p>
                                                             {sub.ai_feedback && (
-                                                               <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100/50">
-                                                                  <p className="text-[10px] font-black text-indigo-900 mb-1 flex items-center gap-2"><Sparkles className="w-3.5 h-3.5" /> Nhận xét từ AI Mentor:</p>
+                                                               <div className="p-4 bg-indigo-50/50 clip-diagonal border border-indigo-100/50">
+                                                                  <p className="text-[10px] font-heading font-black text-indigo-900 mb-1 flex items-center gap-2"><Sparkles className="w-3.5 h-3.5" /> Nhận xét từ AI Mentor:</p>
                                                                   <p className="text-[10px] text-slate-600 font-medium leading-relaxed italic">{sub.ai_feedback}</p>
                                                                </div>
                                                             )}
@@ -895,9 +892,9 @@ export default function EduLessonPlayer() {
                                           </div>
 
                                           <div className="md:col-span-4 space-y-6">
-                                             <div className="bg-indigo-600 rounded-[2.5rem] p-8 text-white shadow-2xl space-y-6 relative overflow-hidden">
+                                             <div className="bg-[#1A237E] clip-diagonal p-8 text-white shadow-2xl space-y-6 relative overflow-hidden">
                                                 <div className="absolute bottom-0 right-0 p-6 opacity-20"><Target className="w-20 h-20" /></div>
-                                                <h4 className="text-sm font-black uppercase tracking-widest text-indigo-200">Điều kiện vượt ải</h4>
+                                                <h4 className="text-sm font-heading font-black uppercase tracking-widest text-indigo-200">Điều kiện vượt ải</h4>
                                                 <div className="space-y-4">
                                                    <div className="flex items-center justify-between">
                                                       <span className="text-[10px] font-bold text-indigo-100 flex items-center gap-2">
@@ -923,7 +920,7 @@ export default function EduLessonPlayer() {
                                                    <button
                                                       disabled={!videoWatched || aiInteractionCount < 3 || !homeworkSubmitted || completingLesson}
                                                       onClick={handleCompleteLesson}
-                                                      className="w-full py-4 bg-white text-indigo-600 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-30"
+                                                      className="w-full py-4 bg-[#FF9800] text-white clip-diagonal-hover font-heading font-black text-xs uppercase tracking-widest shadow-xl hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-30"
                                                    >
                                                       {completingLesson ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Hoàn thành bài học'}
                                                    </button>
@@ -933,17 +930,17 @@ export default function EduLessonPlayer() {
                                                 </div>
                                              </div>
 
-                                             <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm space-y-4">
-                                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                                   <BookmarkPlus className="w-3.5 h-3.5 text-orange-500" /> Lưu trữ quan trọng
+                                             <div className="bg-white clip-diagonal p-8 border border-slate-200 shadow-sm space-y-4">
+                                                <h4 className="text-[10px] font-heading font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                                   <BookmarkPlus className="w-3.5 h-3.5 text-[#FF9800]" /> Lưu trữ quan trọng
                                                 </h4>
                                                 <div className="space-y-3">
-                                                   <button className="w-full flex items-center gap-3 p-3 bg-slate-50 rounded-xl hover:bg-indigo-50 transition-colors group">
-                                                      <div className="w-2 h-2 bg-indigo-600 rounded-full group-hover:scale-150 transition-transform" />
+                                                   <button className="w-full flex items-center gap-3 p-3 bg-slate-50 clip-diagonal hover:bg-indigo-50 transition-colors group">
+                                                      <div className="w-2 h-2 bg-[#1A237E] rounded-full group-hover:scale-150 transition-transform" />
                                                       <span className="text-[11px] font-bold text-slate-600">Flashcard Bài {activeLesson?.order_index}</span>
                                                    </button>
-                                                   <button className="w-full flex items-center gap-3 p-3 bg-slate-50 rounded-xl hover:bg-indigo-50 transition-colors group">
-                                                      <div className="w-2 h-2 bg-indigo-600 rounded-full group-hover:scale-150 transition-transform" />
+                                                   <button className="w-full flex items-center gap-3 p-3 bg-slate-50 clip-diagonal hover:bg-indigo-50 transition-colors group">
+                                                      <div className="w-2 h-2 bg-[#1A237E] rounded-full group-hover:scale-150 transition-transform" />
                                                       <span className="text-[11px] font-bold text-slate-600">Sơ đồ tư duy ngữ pháp</span>
                                                    </button>
                                                 </div>
@@ -951,16 +948,16 @@ export default function EduLessonPlayer() {
                                           </div>
                                        </div>
 
-                                       <div className="bg-white rounded-[3rem] p-10 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center gap-10">
-                                          <div className="w-40 h-40 bg-indigo-50 rounded-[3rem] flex items-center justify-center shrink-0 shadow-inner">
-                                             <Sparkles className="w-16 h-16 text-indigo-600 animate-pulse" />
+                                       <div className="bg-white clip-diagonal p-10 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center gap-10">
+                                          <div className="w-40 h-40 bg-indigo-50 clip-diagonal flex items-center justify-center shrink-0 shadow-inner">
+                                             <Sparkles className="w-16 h-16 text-[#1A237E] animate-pulse" />
                                           </div>
                                           <div className="space-y-4 text-center md:text-left">
-                                             <h3 className="text-2xl font-black text-slate-900 tracking-tight">AI Roleplay Studio</h3>
+                                             <h3 className="text-2xl font-heading font-black text-slate-900 tracking-tight">AI Roleplay Studio</h3>
                                              <p className="text-sm font-medium text-slate-500 leading-relaxed max-w-xl">
                                                 Nếu bạn đang học Online, hãy sử dụng phòng AI Roleplay để giả lập các tình huống thực tế. Mentor AI sẽ đóng vai đối tác, khách hàng hoặc sếp của bạn.
                                              </p>
-                                             <button onClick={() => setActiveZone('zone4')} className="px-8 py-3 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:scale-105 transition-all">
+                                             <button onClick={() => setActiveZone('zone4')} className="px-8 py-3 bg-[#1A237E] text-white clip-diagonal font-heading font-black text-[10px] uppercase tracking-widest shadow-lg hover:scale-105 transition-all">
                                                 Mở phòng Roleplay ngay
                                              </button>
                                           </div>
@@ -974,15 +971,15 @@ export default function EduLessonPlayer() {
                         {/* ZONE 3: CỘNG ĐỒNG */}
                         {activeZone === 'zone3' && (
                            <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-                              <div className="bg-white/90 backdrop-blur-xl rounded-[2.5rem] p-12 border border-slate-100 text-center space-y-6 shadow-sm">
-                                 <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-[2rem] flex items-center justify-center mx-auto shadow-xl shadow-blue-100">
+                              <div className="bg-white/90 backdrop-blur-xl clip-diagonal p-12 border border-slate-100 text-center space-y-6 shadow-sm">
+                                 <div className="w-20 h-20 bg-blue-50 text-blue-600 clip-diagonal flex items-center justify-center mx-auto shadow-xl shadow-blue-100">
                                     <Users className="w-10 h-10" />
                                  </div>
                                  <div className="space-y-2">
-                                    <h2 className="text-2xl font-black text-slate-900">Cộng đồng Toxi Edu</h2>
+                                    <h2 className="text-2xl font-heading font-black text-slate-900">Cộng đồng Toxi Edu</h2>
                                     <p className="text-sm text-slate-400 font-bold uppercase tracking-widest">Nơi thảo luận và chia sẻ kinh nghiệm học tập</p>
                                  </div>
-                                 <button className="px-10 py-4 bg-[#2E3192] text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:bg-black transition-all">Tham gia thảo luận ngay</button>
+                                 <button className="px-10 py-4 bg-[#1A237E] text-white clip-diagonal-hover font-heading font-black text-xs uppercase tracking-widest shadow-xl hover:bg-[#000051] transition-all">Tham gia thảo luận ngay</button>
                               </div>
                            </div>
                         )}
@@ -990,23 +987,23 @@ export default function EduLessonPlayer() {
                         {/* ZONE 4: AI MENTOR */}
                         {activeZone === 'zone4' && (
                            <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-                              <div className="bg-white/90 backdrop-blur-xl rounded-[2.5rem] p-6 border border-slate-200 flex flex-col h-[600px] shadow-sm relative overflow-hidden">
-                                 <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-[80px] -mr-32 -mt-32" />
+                              <div className="bg-white/90 backdrop-blur-xl clip-diagonal p-6 border border-slate-200 flex flex-col h-[600px] shadow-sm relative overflow-hidden">
+                                 <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-[80px] -mr-32 -mt-32" />
                                  <div className="flex items-center gap-4 mb-6 shrink-0 relative z-10">
-                                    <div className="w-12 h-12 bg-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                                    <div className="w-12 h-12 bg-[#1A237E] clip-diagonal flex items-center justify-center text-white shadow-lg">
                                        <Sparkles className="w-7 h-7" />
                                     </div>
                                     <div>
-                                       <h2 className="text-xl font-black text-slate-900 tracking-tight">AI Mentor Trực tuyến</h2>
-                                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Hỏi bất cứ điều gì về tiếng Trung</p>
+                                       <h2 className="text-xl font-heading font-black text-slate-900 tracking-tight">AI Mentor Trực tuyến</h2>
+                                       <p className="text-[10px] font-heading font-black text-slate-400 uppercase tracking-widest">Hỏi bất cứ điều gì về tiếng Trung</p>
                                     </div>
                                  </div>
 
                                  <div className="flex-1 overflow-y-auto custom-scrollbar space-y-5 mb-4 relative z-10 p-2">
                                     {assistantChat.length === 0 && (
                                        <div className="h-full flex flex-col items-center justify-center opacity-40 text-center p-10 space-y-4">
-                                          <Sparkles className="w-12 h-12 text-purple-400" />
-                                          <p className="text-xs font-black uppercase tracking-widest text-slate-500 leading-relaxed">
+                                          <Sparkles className="w-12 h-12 text-[#1A237E]" />
+                                          <p className="text-xs font-heading font-black uppercase tracking-widest text-slate-500 leading-relaxed">
                                              Chào bạn! Tôi là Mentor của bài học "{activeLesson?.title}". <br />
                                              Bạn cần tôi giải thích thêm về từ vựng hay ngữ pháp nào trong bài này không?
                                           </p>
@@ -1014,21 +1011,21 @@ export default function EduLessonPlayer() {
                                     )}
                                     {assistantChat.map((msg, i) => (
                                        <div key={i} className={`flex flex-col gap-2 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                                          <div className={`max-w-[85%] p-5 rounded-[2rem] text-sm font-bold shadow-sm relative group/msg ${msg.role === 'user' ? 'bg-indigo-50 text-indigo-900 rounded-br-none' : 'bg-slate-50 text-slate-800 border border-slate-100 rounded-bl-none'}`}>
+                                          <div className={`max-w-[85%] p-5 clip-diagonal text-sm font-bold shadow-sm relative group/msg ${msg.role === 'user' ? 'bg-indigo-50 text-indigo-900' : 'bg-slate-50 text-slate-800 border border-slate-100'}`}>
                                              {msg.content}
                                              {msg.role === 'ai' && (
                                                 <button
                                                    onClick={() => { navigator.clipboard.writeText(msg.content); alert('Đã sao chép phản hồi!'); }}
-                                                   className="absolute -right-2 -top-2 w-7 h-7 bg-white shadow-md border border-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:text-indigo-600 opacity-0 group-hover/msg:opacity-100 transition-all"
+                                                   className="absolute -right-2 -top-2 w-7 h-7 bg-white shadow-md border border-slate-100 clip-diagonal flex items-center justify-center text-slate-400 hover:text-[#1A237E] opacity-0 group-hover/msg:opacity-100 transition-all"
                                                 >
                                                    <BookmarkPlus className="w-3.5 h-3.5" />
                                                 </button>
                                              )}
                                           </div>
                                           {msg.grammar && (
-                                             <div className="p-4 bg-purple-50/50 border border-purple-100 rounded-2xl text-[10px] font-black text-purple-900 max-w-[80%]">
+                                             <div className="p-4 bg-indigo-50/50 border border-indigo-100 clip-diagonal text-[10px] font-heading font-black text-indigo-900 max-w-[80%]">
                                                 <div className="flex items-center gap-2 mb-2">
-                                                   <div className="w-1.5 h-4 bg-purple-500 rounded-full" />
+                                                   <div className="w-1.5 h-4 bg-[#1A237E] rounded-full" />
                                                    <span className="uppercase tracking-widest">Cấu trúc ngữ pháp</span>
                                                 </div>
                                                 {msg.grammar}
@@ -1037,8 +1034,8 @@ export default function EduLessonPlayer() {
                                           {msg.examples && msg.examples.length > 0 && (
                                              <div className="space-y-2 max-w-[80%]">
                                                 {msg.examples.map((ex: any, idx: number) => (
-                                                   <div key={idx} className="p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
-                                                      <p className="text-[11px] font-black text-slate-900">{ex.zh}</p>
+                                                   <div key={idx} className="p-3 bg-white border border-slate-100 clip-diagonal shadow-sm">
+                                                      <p className="text-[11px] font-heading font-black text-slate-900">{ex.zh}</p>
                                                       <p className="text-[9px] text-slate-400 italic mt-1">{ex.vi}</p>
                                                    </div>
                                                 ))}
@@ -1049,7 +1046,7 @@ export default function EduLessonPlayer() {
                                     {assistantLoading && (
                                        <div className="flex items-center gap-3 text-slate-400">
                                           <Loader2 className="w-4 h-4 animate-spin" />
-                                          <span className="text-[10px] font-black uppercase tracking-widest">AI đang suy nghĩ...</span>
+                                          <span className="text-[10px] font-heading font-black uppercase tracking-widest">AI đang suy nghĩ...</span>
                                        </div>
                                     )}
                                  </div>
@@ -1060,9 +1057,9 @@ export default function EduLessonPlayer() {
                                        onChange={(e) => setAssistantInput(e.target.value)}
                                        onKeyDown={(e) => e.key === 'Enter' && handleAssistantSubmit()}
                                        placeholder="Nhập câu hỏi của bạn tại đây..."
-                                       className="flex-1 p-4 rounded-[1.5rem] border-2 border-slate-100 text-[13px] font-bold focus:outline-none focus:border-purple-600 shadow-sm transition-all bg-white"
+                                       className="flex-1 p-4 clip-diagonal border-2 border-slate-100 text-[13px] font-bold focus:outline-none focus:border-[#1A237E] shadow-sm transition-all bg-white"
                                     />
-                                    <button onClick={handleAssistantSubmit} disabled={assistantLoading || !assistantInput.trim()} className="w-14 h-14 bg-purple-600 text-white rounded-[1.5rem] flex items-center justify-center shadow-lg hover:bg-purple-700 active:scale-95 transition-all disabled:opacity-20">
+                                    <button onClick={handleAssistantSubmit} disabled={assistantLoading || !assistantInput.trim()} className="w-14 h-14 bg-[#1A237E] text-white clip-diagonal-hover flex items-center justify-center shadow-lg hover:bg-[#000051] active:scale-95 transition-all disabled:opacity-20">
                                        {assistantLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Send className="w-6 h-6" />}
                                     </button>
                                  </div>
@@ -1072,12 +1069,12 @@ export default function EduLessonPlayer() {
 
                         {/* FOOTER ACTIONS */}
                         <div className="flex items-center justify-between pt-10 border-t border-slate-100 mt-10 mb-6">
-                           <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-full border border-slate-100">
+                           <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 clip-diagonal border border-slate-100">
                               <Shield className="w-4 h-4 text-emerald-500" />
-                              <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Toxi Edu Secure Portal v2.5</span>
+                              <span className="text-[8px] font-heading font-black text-slate-400 uppercase tracking-widest">Toxi Edu Secure Portal v2.5</span>
                            </div>
                            <button onClick={handleCompleteLesson} disabled={completingLesson}
-                              className="px-10 py-5 bg-gradient-to-r from-[#2E3192] to-indigo-600 text-white rounded-[1.8rem] font-black text-xs uppercase tracking-widest shadow-[0_15px_40px_rgba(46,49,146,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-3 group/finish">
+                              className="px-10 py-5 bg-[#1A237E] text-white clip-diagonal font-heading font-black text-xs uppercase tracking-widest shadow-[0_15px_40px_rgba(26,35,126,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-3 group/finish">
                               {completingLesson ? <Loader2 className="w-4 h-4 animate-spin" /> : (
                                  <>
                                     Hoàn thành bài học
@@ -1095,46 +1092,46 @@ export default function EduLessonPlayer() {
          {/* SUCCESS MODAL */}
          {showSuccessModal && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center bg-indigo-950/60 backdrop-blur-md p-4 animate-in fade-in duration-500">
-               <div className="bg-white rounded-[3rem] p-10 max-w-lg w-full shadow-2xl animate-in zoom-in-95 duration-500 relative overflow-hidden">
+               <div className="bg-white clip-diagonal p-10 max-w-lg w-full shadow-2xl animate-in zoom-in-95 duration-500 relative overflow-hidden">
                   {/* Decorative Elements */}
                   <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-16 -mt-16" />
                   <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -ml-16 -mb-16" />
 
                   <div className="relative z-10 flex flex-col items-center text-center">
-                     <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-[2rem] flex items-center justify-center mb-6 shadow-lg shadow-emerald-100 animate-bounce">
+                     <div className="w-20 h-20 bg-emerald-100 text-emerald-600 clip-diagonal flex items-center justify-center mb-6 shadow-lg shadow-emerald-100 animate-bounce">
                         <Target className="w-10 h-10" />
                      </div>
-                     <h3 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Tuyệt vời, chúc mừng bạn!</h3>
+                     <h3 className="text-3xl font-heading font-black text-slate-900 tracking-tight mb-2">Tuyệt vời, chúc mừng bạn!</h3>
                      <p className="text-slate-500 font-bold text-sm mb-8 uppercase tracking-widest">Bạn đã hoàn thành xuất sắc bài học này</p>
 
                      <div className="grid grid-cols-2 gap-4 w-full mb-10">
-                        <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 flex flex-col items-center gap-2 group hover:bg-white hover:border-indigo-200 transition-all">
-                           <div className="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-indigo-100 group-hover:scale-110 transition-transform">
-                              <Zap className="w-5 h-5 fill-current" />
+                        <div className="p-6 bg-slate-50 clip-diagonal border border-slate-100 flex flex-col items-center gap-2 group hover:bg-white hover:border-indigo-200 transition-all">
+                           <div className="w-10 h-10 bg-[#1A237E] text-white clip-diagonal flex items-center justify-center shadow-lg shadow-indigo-100 group-hover:scale-110 transition-transform">
+                              <Zap className="w-5 h-5 fill-current text-[#FF9800]" />
                            </div>
-                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Kinh nghiệm</p>
-                           <p className="text-2xl font-black text-indigo-900">+{sessionStats.xp} XP</p>
+                           <p className="text-[10px] font-heading font-black text-slate-400 uppercase tracking-widest">Kinh nghiệm</p>
+                           <p className="text-2xl font-heading font-black text-indigo-900">+{sessionStats.xp} XP</p>
                         </div>
-                        <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 flex flex-col items-center gap-2 group hover:bg-white hover:border-emerald-200 transition-all">
-                           <div className="w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-100 group-hover:scale-110 transition-transform">
+                        <div className="p-6 bg-slate-50 clip-diagonal border border-slate-100 flex flex-col items-center gap-2 group hover:bg-white hover:border-emerald-200 transition-all">
+                           <div className="w-10 h-10 bg-emerald-500 text-white clip-diagonal flex items-center justify-center shadow-lg shadow-emerald-100 group-hover:scale-110 transition-transform">
                               <CheckCircle2 className="w-5 h-5" />
                            </div>
-                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Độ chính xác</p>
-                           <p className="text-2xl font-black text-emerald-600">{sessionStats.accuracy}%</p>
+                           <p className="text-[10px] font-heading font-black text-slate-400 uppercase tracking-widest">Độ chính xác</p>
+                           <p className="text-2xl font-heading font-black text-emerald-600">{sessionStats.accuracy}%</p>
                         </div>
                      </div>
 
                      <div className="flex flex-col w-full gap-3">
                         {lessons.findIndex(l => l.id === activeLesson?.id) === lessons.length - 1 ? (
-                           <button onClick={() => navigate(`/edu/course/${courseId}/exam`)} className="w-full py-5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-200 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                           <button onClick={() => navigate(`/edu/course/${courseId}/exam`)} className="w-full py-5 bg-[#1A237E] text-white clip-diagonal-hover font-heading font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-200 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
                               Bắt đầu thi cuối khóa <GraduationCap className="w-5 h-5" />
                            </button>
                         ) : (
-                           <button onClick={handleNextAfterSuccess} className="w-full py-5 bg-gradient-to-r from-[#2E3192] to-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-200 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                           <button onClick={handleNextAfterSuccess} className="w-full py-5 bg-[#1A237E] text-white clip-diagonal-hover font-heading font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-200 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
                               Tiếp tục bài học mới <ArrowRight className="w-4.5 h-4.5" />
                            </button>
                         )}
-                        <button onClick={() => navigate('/edu/dashboard')} className="w-full py-4 bg-white text-slate-400 hover:text-indigo-600 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all">
+                        <button onClick={() => navigate('/edu/dashboard')} className="w-full py-4 bg-white text-slate-400 hover:text-[#1A237E] clip-diagonal font-heading font-black text-[10px] uppercase tracking-widest transition-all">
                            Quay lại Dashboard
                         </button>
                      </div>

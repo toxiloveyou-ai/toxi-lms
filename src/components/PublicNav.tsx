@@ -7,7 +7,7 @@ interface PublicNavProps {
 }
 
 const navLinks = [
-  { to: '/about/chinese', label: 'Tiếng Trung Toxi', mobileLabel: 'Về chúng tôi', icon: <GraduationCap className="w-5 h-5" /> },
+  { to: '/about/chinese', label: 'Về chúng tôi', mobileLabel: 'Về chúng tôi', icon: <GraduationCap className="w-5 h-5" /> },
   { to: '/method', label: 'Phương pháp', mobileLabel: 'Phương pháp', icon: <Lightbulb className="w-5 h-5" /> },
   { to: '/courses', label: 'Khóa học', mobileLabel: 'Khóa học', icon: <BookMarked className="w-5 h-5" /> },
 ];
@@ -18,7 +18,12 @@ export default function PublicNav({ onRegisterClick }: PublicNavProps) {
   const location = useLocation();
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    // Standard stability fix: reserve scrollbar space to prevent layout shifting
+    document.documentElement.style.scrollbarGutter = 'stable';
+    
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -28,7 +33,11 @@ export default function PublicNav({ onRegisterClick }: PublicNavProps) {
   }, [location.pathname]);
 
   useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
     return () => { document.body.style.overflow = ''; };
   }, [mobileOpen]);
 
@@ -36,137 +45,134 @@ export default function PublicNav({ onRegisterClick }: PublicNavProps) {
 
   return (
     <>
-      <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md shadow-slate-200/50' : 'bg-white/90'} backdrop-blur-xl border-b border-slate-100`}>
+      <nav 
+        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${
+          scrolled 
+            ? 'bg-white shadow-sm border-b border-slate-100 py-0' 
+            : 'bg-white/80 backdrop-blur-sm border-b border-transparent py-1'
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 md:h-20">
-
+            
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 group" onClick={() => setMobileOpen(false)}>
-              <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-[#2E3192] flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-                <BookOpen className="w-4 h-4 md:w-5 md:h-5 text-white" />
+            <Link to="/" className="flex items-center gap-3 flex-shrink-0 group" onClick={() => setMobileOpen(false)}>
+              <div className="w-10 h-10 rounded-sm bg-[#1A237E] flex items-center justify-center shadow-lg shadow-indigo-900/20 group-hover:scale-105 transition-transform duration-300 clip-diagonal">
+                <BookOpen className="w-5 h-5 text-white" />
               </div>
               <div className="hidden xs:block">
-                <p className="text-lg md:text-xl font-black tracking-tight text-[#2E3192] uppercase leading-none">TOXI EDU</p>
-                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest hidden sm:block">Smart Learning</p>
+                <p className="text-xl font-heading font-black tracking-tighter text-[#1A237E] uppercase leading-none">TOXI EDU</p>
+                <p className="text-[10px] text-[#FF9800] font-bold uppercase tracking-[0.1em] mt-1">Smart Learning</p>
               </div>
             </Link>
 
-            {/* Desktop Nav */}
-            <div className="hidden md:flex items-center gap-6 lg:gap-8">
+            {/* Desktop Nav - Simple & Clean */}
+            <div className="hidden md:flex items-center gap-8 lg:gap-10">
               {navLinks.map(link => (
                 <Link
                   key={link.to}
                   to={link.to}
-                  className={`text-sm font-bold transition-colors duration-200 relative pb-0.5 ${
+                  className={`text-sm font-bold transition-all duration-200 relative py-1 ${
                     isActive(link.to)
-                      ? 'text-[#2E3192] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#2E3192] after:rounded-full'
+                      ? 'text-[#2E3192]'
                       : 'text-slate-500 hover:text-[#2E3192]'
                   }`}
                 >
                   {link.label}
+                  {isActive(link.to) && (
+                    <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-[#2E3192] rounded-full animate-in fade-in slide-in-from-bottom-1" />
+                  )}
                 </Link>
               ))}
             </div>
 
             {/* Desktop Actions */}
-            <div className="hidden md:flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-5">
               {onRegisterClick && (
-                <button onClick={onRegisterClick} className="text-sm font-bold text-[#2E3192] hover:underline whitespace-nowrap">
-                  Đăng ký tư vấn
+                <button 
+                  onClick={onRegisterClick} 
+                  className="text-sm font-bold text-slate-400 hover:text-[#2E3192] transition-colors"
+                >
+                  Liên hệ
                 </button>
               )}
               <Link
                 to="/edu/login"
-                className="flex items-center gap-1.5 bg-[#2E3192] hover:bg-[#1B1D55] text-white px-4 py-2.5 rounded-xl text-sm font-black uppercase tracking-wider transition-all shadow-lg shadow-indigo-500/20 hover:-translate-y-0.5 whitespace-nowrap"
+                className="bg-[#1A237E] hover:bg-[#000051] text-white px-6 py-2.5 rounded-sm text-sm font-heading font-black uppercase tracking-wider transition-all shadow-lg shadow-indigo-900/20 active:scale-95 clip-diagonal"
               >
-                Đăng nhập <ArrowRight className="w-3.5 h-3.5" />
+                Đăng nhập
               </Link>
             </div>
 
-            {/* Mobile: Register CTA + Hamburger */}
-            <div className="flex md:hidden items-center gap-2">
-              {onRegisterClick && (
-                <button
-                  onClick={onRegisterClick}
-                  className="text-xs font-black text-white bg-orange-500 hover:bg-orange-600 px-3 py-2 rounded-lg uppercase tracking-wide transition-colors"
-                >
-                  Tư vấn
-                </button>
-              )}
-              <button
-                onClick={() => setMobileOpen(prev => !prev)}
-                className="p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors"
-                aria-label="Toggle menu"
-              >
-                {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
+            {/* Mobile Menu Trigger */}
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className={`md:hidden p-2 rounded-xl transition-colors ${
+                mobileOpen ? 'bg-[#2E3192] text-white' : 'bg-slate-50 text-slate-600'
+              }`}
+            >
+              {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
 
-        {/* Mobile Slide-down Menu */}
-        {mobileOpen && (
-          <div className="md:hidden bg-white border-t border-slate-100">
-            <div className="px-4 py-3 space-y-1">
+        {/* Mobile Menu */}
+        <div 
+          className={`md:hidden absolute top-full left-0 right-0 bg-white border-t border-slate-50 shadow-2xl transition-all duration-300 ${
+            mobileOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
+          }`}
+        >
+          <div className="p-4 space-y-1">
+            <Link
+              to="/"
+              className={`flex items-center gap-4 p-4 rounded-sm font-heading font-bold text-sm ${
+                isActive('/') ? 'bg-indigo-50 text-[#1A237E]' : 'text-slate-600'
+              }`}
+            >
+              <Home className="w-5 h-5" /> Trang chủ
+            </Link>
+            {navLinks.map(link => (
               <Link
-                to="/"
-                className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm transition-colors ${
-                  isActive('/') ? 'bg-indigo-50 text-[#2E3192]' : 'text-slate-600 hover:bg-slate-50'
+                key={link.to}
+                to={link.to}
+                className={`flex items-center gap-4 p-4 rounded-sm font-heading font-bold text-sm ${
+                  isActive(link.to) ? 'bg-indigo-50 text-[#1A237E]' : 'text-slate-600'
                 }`}
               >
-                <span className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${isActive('/') ? 'bg-[#2E3192] text-white' : 'bg-slate-100 text-slate-500'}`}>
-                  <Home className="w-4 h-4" />
-                </span>
-                Trang chủ
+                <div className={`w-10 h-10 rounded-sm clip-diagonal flex items-center justify-center ${
+                  isActive(link.to) ? 'bg-[#1A237E] text-white' : 'bg-slate-50 text-slate-400'
+                }`}>
+                  {link.icon}
+                </div>
+                {link.mobileLabel}
               </Link>
-
-              {navLinks.map(link => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm transition-colors ${
-                    isActive(link.to) ? 'bg-indigo-50 text-[#2E3192]' : 'text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <span className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${isActive(link.to) ? 'bg-[#2E3192] text-white' : 'bg-slate-100 text-slate-500'}`}>
-                    {link.icon}
-                  </span>
-                  {link.mobileLabel}
-                </Link>
-              ))}
-            </div>
-
-            {/* Mobile Footer Actions */}
-            <div className="px-4 pb-4 pt-2 border-t border-slate-100 space-y-2">
-              {onRegisterClick && (
-                <button
-                  onClick={() => { setMobileOpen(false); onRegisterClick(); }}
-                  className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-3.5 rounded-2xl font-black text-sm uppercase tracking-wider transition-colors"
-                >
-                  Đăng ký tư vấn miễn phí
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              )}
+            ))}
+            <div className="pt-4 mt-4 border-t border-slate-50 grid grid-cols-2 gap-3">
+              <button
+                onClick={() => { setMobileOpen(false); onRegisterClick?.(); }}
+                className="p-4 rounded-sm clip-diagonal font-heading font-bold text-xs text-slate-500 bg-slate-50 border border-slate-200"
+              >
+                Tư vấn
+              </button>
               <Link
                 to="/edu/login"
-                className="flex items-center justify-center gap-2 w-full px-4 py-3.5 rounded-2xl font-black text-sm text-white bg-[#2E3192] hover:bg-[#1B1D55] transition-colors uppercase tracking-wider"
+                className="flex items-center justify-center gap-2 p-4 rounded-sm clip-diagonal font-heading font-black text-xs text-white bg-[#1A237E]"
               >
-                Đăng nhập hệ thống <ArrowRight className="w-4 h-4" />
+                Đăng nhập <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
-        )}
+        </div>
       </nav>
 
-      {/* Spacer */}
+      {/* Spacer - Keeps layout stable */}
       <div className="h-16 md:h-20" />
 
-      {/* Backdrop for mobile menu */}
+      {/* Backdrop */}
       {mobileOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-slate-900/20 backdrop-blur-sm md:hidden"
+        <div 
+          className="fixed inset-0 z-[90] bg-slate-900/10 backdrop-blur-[2px] md:hidden"
           onClick={() => setMobileOpen(false)}
-          style={{ top: '64px' }}
         />
       )}
     </>

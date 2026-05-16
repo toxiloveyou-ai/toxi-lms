@@ -15,6 +15,11 @@
   --color-student-card: #FFFFFF;
   --color-student-border: #EADBC8;
 
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Montserrat', sans-serif;
+  --font-culture: 'Zhi Mang Xing', cursive;
+
   --animate-spin-slow: spin-slow 3s linear infinite;
   --animate-shimmer: shimmer 2s infinite;
 
@@ -74,5 +79,28 @@
   .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+  
+  /* Tech-Zen Utilities */
+  .tech-zen-glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .tech-zen-glass-light {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(26, 35, 126, 0.1);
+  }
+
+  .clip-diagonal {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+  }
+  
+  .clip-diagonal-hover:hover {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
   }
 }

@@ -59,18 +59,16 @@ export default function EduOverview() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // 0. Track Activity
-      const streak = await trackUserActivity(user.id);
-
       const fallbackName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Học Viên';
       
-      // Fetch data in parallel
-      const [prof, dash, evol, classRes, xpRes] = await Promise.all([
+      // Fetch data in parallel - MOVING trackUserActivity INSIDE for speed
+      const [prof, dash, evol, classRes, xpRes, streak] = await Promise.all([
         getOrCreateProfile(user.id, fallbackName),
         getDashboardData(user.id),
         getLearnerEvolution(user.id),
         supabase.from('edu_class_members').select('*, edu_classes(*, courses(*))').eq('student_id', user.id).maybeSingle(),
-        supabase.from('xp_events').select('created_at, amount').eq('user_id', user.id).gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+        supabase.from('xp_events').select('created_at, amount').eq('user_id', user.id).gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
+        trackUserActivity(user.id)
       ]);
 
       setProfile({ ...prof, streak_days: streak });

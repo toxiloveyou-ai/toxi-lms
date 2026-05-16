@@ -27,24 +27,20 @@ export default function EduLogin() {
     setLoading(true);
     setError(null);
 
-    // Validate Access Code
-    const isValid = await validateAccessCode(accessCode);
-    if (!isValid) {
-      setError("Mã truy cập không hợp lệ, đã được sử dụng hoặc hết hạn.");
-      setLoading(false);
-      return;
-    }
-
     try {
-      // CASE 1: User is already logged in (e.g. via Google), just activating the code
+      // 1. Logic for existing session (Activating code for social login users)
       if (currentUser) {
+        if (!accessCode) throw new Error("Vui lòng nhập Mã truy cập để kích hoạt tài khoản.");
+        
+        const isValid = await validateAccessCode(accessCode);
+        if (!isValid) throw new Error("Mã truy cập không hợp lệ hoặc đã hết hạn.");
+
         const { error: updateError } = await supabase.auth.updateUser({
           data: { is_toxi_student: true, access_code: accessCode }
         });
 
         if (updateError) throw updateError;
 
-        // Update profile too
         await supabase.from('toxi_profiles').upsert([{
           id: currentUser.id,
           is_toxi_student: true,
@@ -57,7 +53,7 @@ export default function EduLogin() {
         return;
       }
 
-      // CASE 2: New login or registration with Email or Phone
+      // 2. Standard Login/Register Logic
       let authEmail = identifier.trim();
       let cleanPhone = '';
 
@@ -68,6 +64,7 @@ export default function EduLogin() {
       }
 
       if (mode === 'login') {
+        // [OPTIMIZATION] Try login first without checking access code
         const { data, error: signInError } = await supabase.auth.signInWithPassword({
           email: authEmail,
           password,
@@ -75,15 +72,37 @@ export default function EduLogin() {
 
         if (signInError) throw signInError;
 
-        if (data.user) {
-          await markCodeAsUsed(accessCode, data.user.id);
+        // If user is already a student (checked via metadata), go in immediately
+        const isStudent = data.user?.user_metadata?.is_toxi_student;
+        if (isStudent || data.user?.email === 'toxiloveyou@gmail.com') {
+           navigate('/edu/overview');
+           return;
         }
+
+        // If not a student yet, they MUST provide a code
+        if (!accessCode) {
+           // We keep them logged in but ask for code
+           setError("Tài khoản chưa được kích hoạt Học viên. Vui lòng nhập Mã truy cập.");
+           setLoading(false);
+           return;
+        }
+
+        const isValid = await validateAccessCode(accessCode);
+        if (!isValid) throw new Error("Mã truy cập không hợp lệ.");
+
+        // Activate account
+        await supabase.auth.updateUser({ data: { is_toxi_student: true, access_code: accessCode } });
+        await markCodeAsUsed(accessCode, data.user.id);
         navigate('/edu/overview');
+
       } else {
         // Register Mode
-        if (!fullName || !password) {
-          throw new Error("Vui lòng điền đầy đủ thông tin.");
+        if (!fullName || !password || !accessCode) {
+          throw new Error("Vui lòng điền đầy đủ thông tin và Mã truy cập.");
         }
+
+        const isValid = await validateAccessCode(accessCode);
+        if (!isValid) throw new Error("Mã truy cập không hợp lệ.");
         
         const { data, error: signUpError } = await supabase.auth.signUp({
           email: authEmail,
@@ -130,15 +149,15 @@ export default function EduLogin() {
       {/* Background Image with Overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-[20000ms] hover:scale-110"
-        style={{ backgroundImage: 'url("/assets/images/edu_bg.png")' }}
+        style={{ backgroundImage: 'url("/assets/images/toxi_edu_login_bg.png")' }}
       />
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px]" />
 
       {/* Main Content */}
       <div className="w-full max-w-sm p-6 sm:p-8 bg-white/90 backdrop-blur-xl rounded-[2.5rem] relative z-10 border border-white/20 shadow-2xl space-y-6">
         <div className="text-center">
-          <div className="w-14 h-14 rounded-2xl bg-[#2E3192] flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/20 relative">
-            <BookOpen className="w-7 h-7 text-white" />
+          <div className="w-16 h-16 rounded-[1.5rem] overflow-hidden mx-auto mb-4 shadow-xl shadow-indigo-500/20 relative group hover:scale-105 transition-transform duration-500">
+            <img src="/assets/images/toxi_edu_logo.png" alt="TOXI EDU" className="w-full h-full object-cover" />
             <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full border-2 border-white flex items-center justify-center">
               <Cpu className="w-2 h-2 text-white" />
             </div>
@@ -194,11 +213,10 @@ export default function EduLogin() {
               </div>
               <input
                 type="text"
-                required
                 value={accessCode}
                 onChange={(e) => setAccessCode(e.target.value)}
                 className="block w-full pl-11 pr-4 py-3 border border-orange-100 rounded-xl bg-orange-50/50 text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:bg-white focus:border-[#2E3192] transition-all text-xs uppercase"
-                placeholder="MÃ TRUY CẬP HỌC VIÊN"
+                placeholder={mode === 'login' ? "MÃ TRUY CẬP (Nếu chưa kích hoạt)" : "MÃ TRUY CẬP HỌC VIÊN"}
               />
             </div>
 

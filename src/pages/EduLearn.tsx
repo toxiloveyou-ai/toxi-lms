@@ -145,21 +145,21 @@ export default function EduLearn() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#F9F6ED] text-[#2E3192] font-sans overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#F9F6ED] text-[#1A237E] font-sans overflow-hidden">
       {/* 1. HEADER THÔNG MINH */}
       <header className="h-16 bg-white border-b border-[#EADBC8] px-6 flex items-center justify-between shrink-0 z-10 shadow-sm">
         <div className="flex items-center gap-6">
-          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm font-black text-slate-400 hover:text-[#2E3192] transition-colors uppercase tracking-widest">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm font-heading font-black text-slate-400 hover:text-[#1A237E] transition-colors uppercase tracking-widest">
             <ArrowLeft className="w-4 h-4" /> Thoát
           </button>
           <div className="h-6 w-px bg-slate-200"></div>
           <div>
-            <h1 className="text-sm font-black tracking-tight">{MOCK_LESSON.title}</h1>
+            <h1 className="text-sm font-heading font-black tracking-tight">{MOCK_LESSON.title}</h1>
             <div className="flex items-center gap-2 mt-1">
               <div className="h-1.5 w-32 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full bg-orange-500 rounded-full" style={{ width: `${MOCK_LESSON.progress}%` }}></div>
+                <div className="h-full bg-[#FF9800] rounded-full" style={{ width: `${MOCK_LESSON.progress}%` }}></div>
               </div>
-              <span className="text-[9px] font-black text-slate-400 uppercase">{MOCK_LESSON.progress}% Khóa học</span>
+              <span className="text-[9px] font-heading font-black text-slate-400 uppercase">{MOCK_LESSON.progress}% Khóa học</span>
             </div>
           </div>
         </div>
@@ -168,17 +168,17 @@ export default function EduLearn() {
         <div className="flex items-center gap-4">
           <div className={`flex items-center gap-2 ${activeTab === 'understand' ? 'text-emerald-600' : 'text-slate-400'}`}>
             <CheckCircle2 className="w-5 h-5" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Hiểu</span>
+            <span className="text-[10px] font-heading font-black uppercase tracking-widest">Hiểu</span>
           </div>
           <div className="w-8 h-px bg-slate-200"></div>
-          <div className={`flex items-center gap-2 ${activeTab === 'practice' ? 'text-orange-500' : 'text-slate-400'}`}>
+          <div className={`flex items-center gap-2 ${activeTab === 'practice' ? 'text-[#FF9800]' : 'text-slate-400'}`}>
             <Target className="w-5 h-5" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Luyện</span>
+            <span className="text-[10px] font-heading font-black uppercase tracking-widest">Luyện</span>
           </div>
           <div className="w-8 h-px bg-slate-200"></div>
-          <div className={`flex items-center gap-2 ${activeTab === 'apply' ? 'text-[#2E3192]' : 'text-slate-400'}`}>
+          <div className={`flex items-center gap-2 ${activeTab === 'apply' ? 'text-[#1A237E]' : 'text-slate-400'}`}>
             <Zap className="w-5 h-5" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Dùng ngay</span>
+            <span className="text-[10px] font-heading font-black uppercase tracking-widest">Dùng ngay</span>
           </div>
         </div>
       </header>
@@ -194,20 +194,20 @@ export default function EduLearn() {
             {activeTab === 'understand' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
                 {/* Tình huống mở đầu */}
-                <section className="bg-white rounded-3xl p-8 border border-[#EADBC8] shadow-sm relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-2 h-full bg-[#2E3192]"></div>
+                <section className="bg-white clip-diagonal p-8 border border-slate-200 shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-2 h-full bg-[#1A237E]"></div>
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-blue-50 text-[#2E3192] rounded-2xl flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 bg-indigo-50 text-[#1A237E] clip-diagonal flex items-center justify-center shrink-0">
                       <Play className="w-6 h-6 ml-1" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">📍 Tình huống thực tế</p>
+                      <p className="text-[10px] font-heading font-black text-slate-400 uppercase tracking-widest mb-2">📍 Tình huống thực tế</p>
                       <p className="text-slate-600 font-medium mb-4">Bạn đang làm việc tại nhà máy Foxconn. Quản lý người Trung hỏi:</p>
-                      <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <p className="text-xl font-black text-[#2E3192]">"今天的生产任务完成了吗?"</p>
+                      <div className="bg-slate-50 p-4 clip-diagonal border border-slate-100">
+                        <p className="text-xl font-heading font-black text-[#1A237E]">"今天的生产任务完成了吗?"</p>
                         <p className="text-sm text-slate-500 mt-1">jīntiān de shēngchǎn rènwu wánchéng le ma?</p>
                       </div>
-                      <p className="text-sm font-bold text-orange-500 mt-4 flex items-center gap-2">
+                      <p className="text-sm font-bold text-[#FF9800] mt-4 flex items-center gap-2">
                         <Target className="w-4 h-4" /> Mục tiêu bài học: Bạn cần hiểu và trả lời được câu này.
                       </p>
                     </div>
@@ -216,26 +216,26 @@ export default function EduLearn() {
 
                 {/* Từ vựng chính */}
                 <section className="space-y-4">
-                  <h3 className="text-lg font-black flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-orange-500" /> Từ vựng cốt lõi
+                  <h3 className="text-lg font-heading font-black flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-[#FF9800]" /> Từ vựng cốt lõi
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {MOCK_LESSON.vocabulary.map((word) => (
-                      <div key={word.id} className="bg-white p-5 rounded-2xl border border-[#EADBC8] flex items-center justify-between group hover:border-[#2E3192] transition-colors cursor-pointer">
+                      <div key={word.id} className="bg-white p-5 clip-diagonal border border-slate-200 flex items-center justify-between group hover:border-[#1A237E] transition-colors cursor-pointer">
                         <div className="flex items-center gap-4">
-                          <button className="w-10 h-10 bg-blue-50 text-[#2E3192] rounded-xl flex items-center justify-center group-hover:bg-[#2E3192] group-hover:text-white transition-colors">
+                          <button className="w-10 h-10 bg-indigo-50 text-[#1A237E] clip-diagonal flex items-center justify-center group-hover:bg-[#1A237E] group-hover:text-white transition-colors">
                             <Volume2 className="w-5 h-5" />
                           </button>
                           <div>
-                            <p className="text-2xl font-black">{word.hanzi}</p>
+                            <p className="text-2xl font-heading font-black">{word.hanzi}</p>
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-xs font-medium text-slate-500">{word.pinyin}</span>
                               <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                              <span className="text-xs font-bold text-orange-500">{word.meaning}</span>
+                              <span className="text-xs font-bold text-[#FF9800]">{word.meaning}</span>
                             </div>
                           </div>
                         </div>
-                        <button className="text-slate-300 hover:text-[#2E3192]" title="Thêm vào Sổ Tay">
+                        <button className="text-slate-300 hover:text-[#1A237E]" title="Thêm vào Sổ Tay">
                           <BookmarkPlus className="w-6 h-6" />
                         </button>
                       </div>
@@ -244,19 +244,19 @@ export default function EduLearn() {
                 </section>
 
                 {/* Ngữ pháp */}
-                <section className="bg-[#2E3192] text-white p-8 rounded-3xl shadow-lg relative overflow-hidden">
+                <section className="bg-[#1A237E] text-white p-8 clip-diagonal shadow-lg relative overflow-hidden">
                   <Sparkles className="absolute top-4 right-4 w-24 h-24 text-white opacity-5" />
-                  <h3 className="text-lg font-black mb-4">Cấu trúc: Động từ + 完 + (了) + (O)</h3>
+                  <h3 className="text-lg font-heading font-black mb-4">Cấu trúc: Động từ + 完 + (了) + (O)</h3>
                   <p className="text-white/80 font-medium mb-6">Diễn tả hành động đã được hoàn tất một cách trọn vẹn.</p>
-                  <div className="bg-white/10 p-4 rounded-xl border border-white/20">
+                  <div className="bg-white/10 p-4 clip-diagonal border border-white/20">
                     <div className="flex items-center justify-between text-center">
-                      <div className="flex-1"><p className="text-xl font-black">写</p><p className="text-xs text-white/60">xiě (viết)</p></div>
-                      <div className="text-orange-400 font-black">+</div>
-                      <div className="flex-1"><p className="text-xl font-black">完</p><p className="text-xs text-white/60">wán (xong)</p></div>
-                      <div className="text-orange-400 font-black">+</div>
-                      <div className="flex-1"><p className="text-xl font-black">了</p><p className="text-xs text-white/60">le</p></div>
-                      <div className="text-orange-400 font-black">=</div>
-                      <div className="flex-1"><p className="text-xl font-black text-emerald-400">写完了</p><p className="text-xs text-white/60">viết xong rồi</p></div>
+                      <div className="flex-1"><p className="text-xl font-heading font-black">写</p><p className="text-xs text-white/60">xiě (viết)</p></div>
+                      <div className="text-[#FF9800] font-heading font-black">+</div>
+                      <div className="flex-1"><p className="text-xl font-heading font-black">完</p><p className="text-xs text-white/60">wán (xong)</p></div>
+                      <div className="text-[#FF9800] font-heading font-black">+</div>
+                      <div className="flex-1"><p className="text-xl font-heading font-black">了</p><p className="text-xs text-white/60">le</p></div>
+                      <div className="text-[#FF9800] font-heading font-black">=</div>
+                      <div className="flex-1"><p className="text-xl font-heading font-black text-emerald-400">写完了</p><p className="text-xs text-white/60">viết xong rồi</p></div>
                     </div>
                   </div>
                 </section>
@@ -267,26 +267,26 @@ export default function EduLearn() {
             {activeTab === 'practice' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
                 <div className="flex items-center justify-between">
-                   <h2 className="text-2xl font-black flex items-center gap-2"><Target className="w-6 h-6 text-orange-500" /> Thực Hành Thông Minh</h2>
+                   <h2 className="text-2xl font-heading font-black flex items-center gap-2"><Target className="w-6 h-6 text-[#FF9800]" /> Thực Hành Thông Minh</h2>
                    <div className="flex gap-2">
                       {PRACTICE_EXERCISES.map((_, idx) => (
-                         <div key={idx} className={`h-2 rounded-full transition-all ${idx === currentExIdx ? 'w-8 bg-orange-500' : idx < currentExIdx ? 'w-4 bg-emerald-500' : 'w-4 bg-slate-200'}`} />
+                         <div key={idx} className={`h-2 rounded-full transition-all ${idx === currentExIdx ? 'w-8 bg-[#FF9800]' : idx < currentExIdx ? 'w-4 bg-emerald-500' : 'w-4 bg-slate-200'}`} />
                       ))}
                    </div>
                 </div>
 
-                <div className="bg-white rounded-3xl p-8 border border-[#EADBC8] shadow-sm relative overflow-hidden">
-                   <div className="absolute top-0 left-0 w-2 h-full bg-orange-500"></div>
+                <div className="bg-white clip-diagonal p-8 border border-slate-200 shadow-sm relative overflow-hidden">
+                   <div className="absolute top-0 left-0 w-2 h-full bg-[#FF9800]"></div>
                    
                    <div className="mb-8">
-                      <span className="px-3 py-1 bg-orange-50 text-orange-600 text-[10px] font-black uppercase tracking-widest rounded-full mb-4 inline-block">
+                      <span className="px-3 py-1 bg-orange-50 text-[#FF9800] text-[10px] font-heading font-black uppercase tracking-widest clip-diagonal mb-4 inline-block">
                          Bài tập {currentExIdx + 1}/4
                       </span>
                       <h3 className="text-xl font-bold whitespace-pre-line leading-relaxed">
                          {ex.question}
                       </h3>
                       {ex.type === 'listen_select' && (
-                        <button className="mt-4 px-6 py-3 bg-blue-50 text-[#2E3192] rounded-xl flex items-center gap-3 font-bold hover:bg-[#2E3192] hover:text-white transition-colors">
+                        <button className="mt-4 px-6 py-3 bg-indigo-50 text-[#1A237E] clip-diagonal flex items-center gap-3 font-bold hover:bg-[#1A237E] hover:text-white transition-colors">
                           <AudioLines className="w-5 h-5" /> Nghe đoạn hội thoại
                         </button>
                       )}
@@ -298,16 +298,16 @@ export default function EduLearn() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                          {ex.options?.map((opt, idx) => {
                             const isCorrectAns = idx === ex.correctIndex;
-                            let style = 'border-slate-100 hover:border-slate-300 text-slate-700 bg-white';
+                            let style = 'border-slate-200 hover:border-[#1A237E] text-slate-700 bg-white';
                             if (showExplain) {
                                style = isCorrectAns ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : selectedOpt === idx ? 'border-red-500 bg-red-50 text-red-700' : style;
                             } else if (selectedOpt === idx) {
-                               style = 'border-[#2E3192] bg-blue-50 text-[#2E3192]';
+                               style = 'border-[#1A237E] bg-indigo-50 text-[#1A237E]';
                             }
                             return (
-                              <button key={idx} onClick={() => !showExplain && setSelectedOpt(idx)} disabled={showExplain} className={`p-4 rounded-xl border-2 text-left font-bold transition-all ${style}`}>
+                              <button key={idx} onClick={() => !showExplain && setSelectedOpt(idx)} disabled={showExplain} className={`p-4 clip-diagonal border border-2 text-left font-bold transition-all ${style}`}>
                                  <div className="flex items-center gap-3">
-                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${showExplain && isCorrectAns ? 'border-emerald-500 bg-emerald-500 text-white' : selectedOpt === idx ? 'border-[#2E3192] bg-[#2E3192] text-white' : 'border-slate-300'}`}>
+                                    <div className={`w-6 h-6 clip-diagonal border border-2 flex items-center justify-center shrink-0 ${showExplain && isCorrectAns ? 'border-emerald-500 bg-emerald-500 text-white' : selectedOpt === idx ? 'border-[#1A237E] bg-[#1A237E] text-white' : 'border-slate-300'}`}>
                                        {showExplain && isCorrectAns ? <Check className="w-3 h-3" /> : <span className="text-[10px]">{String.fromCharCode(65 + idx)}</span>}
                                     </div>
                                     {opt}
@@ -321,17 +321,17 @@ export default function EduLearn() {
                    {/* TYPE 3: ORDER SENTENCE */}
                    {ex.type === 'order_sentence' && (
                      <div className="space-y-6 mb-8">
-                        <div className="min-h-[4rem] p-4 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 flex flex-wrap gap-2 items-center justify-center">
+                        <div className="min-h-[4rem] p-4 clip-diagonal border-2 border-dashed border-slate-300 bg-slate-50 flex flex-wrap gap-2 items-center justify-center">
                            {orderedWords.length === 0 && <span className="text-slate-400 font-medium text-sm">Bấm vào các từ bên dưới để sắp xếp</span>}
                            {orderedWords.map((word, idx) => (
-                             <button key={idx} onClick={() => handleWordSelect(word, false)} disabled={showExplain} className="px-4 py-2 bg-[#2E3192] text-white font-bold rounded-lg shadow-sm hover:bg-[#1E2060] transition-colors transform active:scale-95">
+                             <button key={idx} onClick={() => handleWordSelect(word, false)} disabled={showExplain} className="px-4 py-2 bg-[#1A237E] text-white font-bold clip-diagonal shadow-sm hover:bg-[#000051] transition-colors transform active:scale-95">
                                {word}
                              </button>
                            ))}
                         </div>
                         <div className="flex flex-wrap gap-2 justify-center">
                            {availableWords.map((word, idx) => (
-                             <button key={idx} onClick={() => handleWordSelect(word, true)} disabled={showExplain} className="px-4 py-2 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-lg hover:border-orange-500 transition-colors transform active:scale-95">
+                             <button key={idx} onClick={() => handleWordSelect(word, true)} disabled={showExplain} className="px-4 py-2 bg-white border border-slate-200 text-slate-700 font-bold clip-diagonal hover:border-[#FF9800] hover:text-[#FF9800] transition-colors transform active:scale-95">
                                {word}
                              </button>
                            ))}
@@ -345,10 +345,10 @@ export default function EduLearn() {
                         <textarea 
                            value={translateText} onChange={(e) => setTranslateText(e.target.value)} disabled={showExplain}
                            placeholder="Nhập câu dịch tiếng Trung của bạn vào đây..."
-                           className="w-full p-4 rounded-2xl border-2 border-slate-200 focus:outline-none focus:border-[#2E3192] resize-none h-32 text-lg disabled:bg-slate-50 disabled:text-slate-600"
+                           className="w-full p-4 clip-diagonal border border-slate-200 focus:outline-none focus:border-[#1A237E] focus:ring-1 focus:ring-[#1A237E] resize-none h-32 text-lg disabled:bg-slate-50 disabled:text-slate-600"
                         />
                         <div className="flex gap-2 text-sm font-bold text-slate-500">
-                          Gợi ý từ vựng: {ex.hints?.map((hint, i) => <span key={i} className="px-2 py-1 bg-slate-100 rounded-md">{hint}</span>)}
+                          Gợi ý từ vựng: {ex.hints?.map((hint, i) => <span key={i} className="px-2 py-1 bg-slate-100 clip-diagonal">{hint}</span>)}
                         </div>
                      </div>
                    )}
@@ -357,15 +357,15 @@ export default function EduLearn() {
                    {showExplain ? (
                       <div className="animate-in fade-in slide-in-from-top-4">
                          {ex.type === 'translate' || ex.type === 'order_sentence' ? (
-                            <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-                               <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Đáp án mẫu chính xác</p>
-                               <p className="text-xl font-black text-emerald-800">{ex.type === 'translate' ? ex.expected : ex.correctOrder?.join('')}</p>
+                            <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 clip-diagonal">
+                               <p className="text-[10px] font-heading font-black text-emerald-600 uppercase tracking-widest mb-1">Đáp án mẫu chính xác</p>
+                               <p className="text-xl font-heading font-black text-emerald-800">{ex.type === 'translate' ? ex.expected : ex.correctOrder?.join('')}</p>
                             </div>
                          ) : null}
-                         <div className="p-5 bg-blue-50 rounded-xl border border-blue-100 mb-6">
-                            <p className="flex items-start gap-3 text-[#2E3192]"><Info className="w-5 h-5 shrink-0 mt-0.5" /> <span className="font-medium text-sm leading-relaxed">{ex.explain}</span></p>
+                         <div className="p-5 bg-indigo-50 clip-diagonal border border-indigo-100 mb-6">
+                            <p className="flex items-start gap-3 text-[#1A237E]"><Info className="w-5 h-5 shrink-0 mt-0.5" /> <span className="font-medium text-sm leading-relaxed">{ex.explain}</span></p>
                          </div>
-                         <button onClick={nextPractice} className="w-full py-4 bg-[#2E3192] text-white rounded-xl font-black uppercase tracking-widest hover:bg-[#1E2060] transition-colors flex items-center justify-center gap-2">
+                         <button onClick={nextPractice} className="w-full py-4 bg-[#1A237E] text-white clip-diagonal-hover font-heading font-black uppercase tracking-widest hover:bg-[#000051] transition-colors flex items-center justify-center gap-2">
                             {currentExIdx < PRACTICE_EXERCISES.length - 1 ? 'Bài tập tiếp theo' : 'Hoàn thành luyện tập'} <ChevronRight className="w-5 h-5" />
                          </button>
                       </div>
@@ -373,7 +373,7 @@ export default function EduLearn() {
                       <button 
                          onClick={checkPracticeAnswer} 
                          disabled={!isPracticeAnswerReady()}
-                         className="w-full py-4 bg-orange-500 text-white rounded-xl font-black uppercase tracking-widest disabled:opacity-50 hover:bg-orange-600 transition-colors"
+                         className="w-full py-4 bg-[#FF9800] text-white clip-diagonal-hover font-heading font-black uppercase tracking-widest disabled:opacity-50 hover:bg-orange-600 transition-colors"
                       >
                          Kiểm tra đáp án
                       </button>
@@ -385,26 +385,26 @@ export default function EduLearn() {
             {/* TAB: DÙNG NGAY */}
             {activeTab === 'apply' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
-                <section className="bg-white rounded-3xl p-8 border border-[#EADBC8] shadow-sm flex flex-col h-[600px]">
+                <section className="bg-white clip-diagonal p-8 border border-slate-200 shadow-sm flex flex-col h-[600px]">
                   <div className="flex items-center justify-between mb-6 shrink-0">
                      <div>
-                        <h3 className="text-xl font-black flex items-center gap-2 text-[#2E3192]">
-                           <Zap className="w-6 h-6 text-orange-500" /> Nhập vai Thực chiến
+                        <h3 className="text-xl font-heading font-black flex items-center gap-2 text-[#1A237E]">
+                           <Zap className="w-6 h-6 text-[#FF9800]" /> Nhập vai Thực chiến
                         </h3>
                         <p className="text-sm font-medium text-slate-500 mt-1">Đóng vai Quản lý nhà máy và sử dụng các câu vừa học.</p>
                      </div>
-                     <span className="px-4 py-1.5 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-full flex items-center gap-1"><Sparkles className="w-3 h-3" /> AI Roleplay</span>
+                     <span className="px-4 py-1.5 bg-emerald-50 text-emerald-600 text-[10px] font-heading font-black uppercase tracking-widest clip-diagonal flex items-center gap-1"><Sparkles className="w-3 h-3" /> AI Roleplay</span>
                   </div>
                   
                   {/* Chat Container */}
-                  <div className="flex-1 bg-slate-50 rounded-2xl border border-slate-100 p-6 overflow-y-auto custom-scrollbar space-y-6 mb-4">
+                  <div className="flex-1 bg-slate-50 clip-diagonal border border-slate-200 p-6 overflow-y-auto custom-scrollbar space-y-6 mb-4">
                      {roleplayChat.map((msg, i) => (
                         <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                           <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-xs shadow-sm ${msg.role === 'user' ? 'bg-orange-500' : 'bg-[#2E3192]'}`}>
+                           <div className={`w-10 h-10 clip-diagonal flex items-center justify-center shrink-0 text-white font-bold text-xs shadow-sm ${msg.role === 'user' ? 'bg-[#FF9800]' : 'bg-[#1A237E]'}`}>
                               {msg.role === 'user' ? 'Bạn' : 'AI'}
                            </div>
-                           <div className={`max-w-[80%] ${msg.role === 'user' ? 'bg-orange-500 text-white' : 'bg-white text-[#2E3192]'} p-4 rounded-2xl ${msg.role === 'user' ? 'rounded-tr-none' : 'rounded-tl-none border border-slate-200'} shadow-sm`}>
-                              <p className={`font-bold text-lg ${msg.role === 'user' ? 'text-white' : 'text-[#2E3192]'}`}>{msg.content}</p>
+                           <div className={`max-w-[80%] ${msg.role === 'user' ? 'bg-[#FF9800] text-white' : 'bg-white text-[#1A237E]'} p-4 clip-diagonal ${msg.role === 'user' ? 'rounded-tr-none' : 'rounded-tl-none border border-slate-200'} shadow-sm`}>
+                              <p className={`font-bold text-lg ${msg.role === 'user' ? 'text-white' : 'text-[#1A237E]'}`}>{msg.content}</p>
                               {msg.vi && <p className={`text-xs mt-2 pt-2 border-t ${msg.role === 'user' ? 'border-orange-400 text-orange-100' : 'border-slate-100 text-slate-500'}`}>{msg.vi}</p>}
                            </div>
                         </div>
@@ -417,13 +417,13 @@ export default function EduLearn() {
                         value={roleplayInput}
                         onChange={(e) => setRoleplayInput(e.target.value)}
                         placeholder="Gõ câu trả lời của bạn bằng tiếng Trung..." 
-                        className="w-full p-4 rounded-2xl border border-slate-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 resize-none h-24 text-base"
+                        className="w-full p-4 clip-diagonal border border-slate-200 focus:outline-none focus:border-[#FF9800] focus:ring-1 focus:ring-[#FF9800] resize-none h-24 text-base"
                      ></textarea>
                      <div className="flex justify-between items-center mt-3">
-                        <button className="text-slate-400 hover:text-[#2E3192] text-sm font-bold flex items-center gap-2 transition-colors">
+                        <button className="text-slate-400 hover:text-[#1A237E] text-sm font-bold flex items-center gap-2 transition-colors">
                            <RefreshCw className="w-4 h-4" /> Bắt đầu lại
                         </button>
-                        <button onClick={handleRoleplaySubmit} disabled={!roleplayInput.trim()} className="px-8 py-3 bg-[#2E3192] disabled:bg-slate-300 text-white rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-[#1E2060] transition-colors shadow-md">
+                        <button onClick={handleRoleplaySubmit} disabled={!roleplayInput.trim()} className="px-8 py-3 bg-[#1A237E] disabled:bg-slate-300 text-white clip-diagonal font-bold text-sm flex items-center gap-2 hover:bg-[#000051] transition-colors shadow-md">
                            <Send className="w-4 h-4" /> Gửi để AI chấm
                         </button>
                      </div>
@@ -435,13 +435,13 @@ export default function EduLearn() {
         </main>
 
         {/* SIDEBAR TONGXIAO AI (30%) */}
-        <aside className="w-80 lg:w-96 bg-white border-l border-[#EADBC8] flex flex-col shrink-0 shadow-[-4px_0_24px_rgba(0,0,0,0.02)]">
-          <div className="p-4 border-b border-[#EADBC8] flex items-center gap-3 bg-slate-50">
-            <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-[#2E3192] rounded-xl flex items-center justify-center shadow-lg">
+        <aside className="w-80 lg:w-96 bg-white border-l border-slate-200 flex flex-col shrink-0 shadow-[0_0_24px_rgba(0,0,0,0.05)]">
+          <div className="p-4 border-b border-slate-200 flex items-center gap-3 bg-slate-50">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#FF9800] to-[#1A237E] clip-diagonal flex items-center justify-center shadow-lg">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-sm font-black text-[#2E3192]">Tongxiao AI Mentor</h2>
+              <h2 className="text-sm font-heading font-black text-[#1A237E]">Tongxiao AI Mentor</h2>
               <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Sẵn sàng hỗ trợ
               </p>
@@ -451,20 +451,20 @@ export default function EduLearn() {
           <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
             {chatHistory.map((msg, idx) => (
               <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-white text-[10px] font-black ${msg.role === 'user' ? 'bg-orange-500' : 'bg-[#2E3192]'}`}>
+                <div className={`w-8 h-8 clip-diagonal flex items-center justify-center shrink-0 text-white text-[10px] font-heading font-black ${msg.role === 'user' ? 'bg-[#FF9800]' : 'bg-[#1A237E]'}`}>
                   {msg.role === 'user' ? 'Bạn' : 'AI'}
                 </div>
-                <div className={`p-3 rounded-2xl text-sm ${msg.role === 'user' ? 'bg-orange-50 text-orange-900 border border-orange-100 rounded-tr-none' : 'bg-slate-50 text-slate-700 border border-slate-100 rounded-tl-none'}`}>
+                <div className={`p-3 clip-diagonal text-sm ${msg.role === 'user' ? 'bg-orange-50 text-orange-900 border border-orange-100 rounded-tr-none' : 'bg-slate-50 text-slate-700 border border-slate-100 rounded-tl-none'}`}>
                   {msg.content}
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="p-4 border-t border-[#EADBC8] bg-white">
+          <div className="p-4 border-t border-slate-200 bg-white">
             <div className="flex flex-wrap gap-2 mb-3">
-              <button onClick={() => setAiInput('Giải thích thêm ngữ pháp này')} className="text-[10px] px-3 py-1.5 bg-slate-100 text-slate-600 rounded-full font-bold hover:bg-slate-200 transition-colors">Giải thích ngữ pháp</button>
-              <button onClick={() => setAiInput('Cho thêm ví dụ thực tế')} className="text-[10px] px-3 py-1.5 bg-slate-100 text-slate-600 rounded-full font-bold hover:bg-slate-200 transition-colors">Thêm ví dụ</button>
+              <button onClick={() => setAiInput('Giải thích thêm ngữ pháp này')} className="text-[10px] px-3 py-1.5 bg-slate-100 text-slate-600 clip-diagonal font-bold hover:bg-slate-200 transition-colors">Giải thích ngữ pháp</button>
+              <button onClick={() => setAiInput('Cho thêm ví dụ thực tế')} className="text-[10px] px-3 py-1.5 bg-slate-100 text-slate-600 clip-diagonal font-bold hover:bg-slate-200 transition-colors">Thêm ví dụ</button>
             </div>
             <form onSubmit={handleAiSubmit} className="flex items-center gap-2 relative">
               <input 
@@ -472,9 +472,9 @@ export default function EduLearn() {
                 value={aiInput}
                 onChange={(e) => setAiInput(e.target.value)}
                 placeholder="Hỏi Tongxiao AI..." 
-                className="w-full bg-slate-50 border border-[#EADBC8] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#2E3192] focus:ring-2 focus:ring-[#2E3192]/20"
+                className="w-full bg-slate-50 border border-slate-200 clip-diagonal px-4 py-3 text-sm focus:outline-none focus:border-[#1A237E] focus:ring-1 focus:ring-[#1A237E]"
               />
-              <button type="submit" disabled={!aiInput.trim()} className="absolute right-2 p-1.5 bg-[#2E3192] text-white rounded-lg disabled:opacity-50 hover:bg-[#1E2060] transition-colors">
+              <button type="submit" disabled={!aiInput.trim()} className="absolute right-2 p-1.5 bg-[#1A237E] text-white clip-diagonal disabled:opacity-50 hover:bg-[#000051] transition-colors">
                 <Send className="w-4 h-4" />
               </button>
             </form>
@@ -485,47 +485,47 @@ export default function EduLearn() {
 
       {/* 3. FOOTER ĐIỀU HƯỚNG */}
       <footer className="h-16 bg-white border-t border-[#EADBC8] px-6 flex items-center justify-between shrink-0 z-10 shadow-[0_-4px_24px_rgba(0,0,0,0.02)]">
-        <button className="flex items-center gap-2 text-sm font-black text-slate-400 hover:text-[#2E3192] transition-colors">
+        <button className="flex items-center gap-2 text-sm font-heading font-black text-slate-400 hover:text-[#1A237E] transition-colors">
           <ChevronLeft className="w-5 h-5" /> Bài trước
         </button>
         
-        <button onClick={handleCompletePhase} className="px-8 py-3 bg-[#2E3192] text-white rounded-xl font-black text-sm uppercase tracking-widest hover:bg-[#1E2060] transition-colors shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2">
+        <button onClick={handleCompletePhase} className="px-8 py-3 bg-[#1A237E] text-white clip-diagonal font-heading font-black text-sm uppercase tracking-widest hover:bg-[#000051] transition-colors shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2">
           {activeTab === 'understand' ? 'Tiếp tục: Luyện tập' : activeTab === 'practice' ? 'Tiếp tục: Dùng ngay' : 'Hoàn thành bài học'} <ChevronRight className="w-4 h-4" />
         </button>
       </footer>
 
       {/* POPUP THÔNG BÁO HOÀN THÀNH */}
       {showProgressPopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2E3192]/40 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-[2rem] p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-300">
-            <div className="w-16 h-16 bg-orange-100 text-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6 transform -rotate-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-in fade-in">
+          <div className="bg-white clip-diagonal p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="w-16 h-16 bg-orange-100 text-[#FF9800] clip-diagonal flex items-center justify-center mx-auto mb-6 transform -rotate-6">
               <Target className="w-8 h-8" />
             </div>
             <div className="text-center space-y-2 mb-8">
-              <h3 className="text-2xl font-black text-[#2E3192]">Tuyệt vời!</h3>
+              <h3 className="text-2xl font-heading font-black text-[#1A237E]">Tuyệt vời!</h3>
               <p className="text-slate-500 font-medium">Bạn vừa hoàn thành {MOCK_LESSON.title}</p>
             </div>
             
-            <div className="bg-slate-50 rounded-2xl p-4 space-y-3 mb-8 border border-slate-100">
+            <div className="bg-slate-50 clip-diagonal p-4 space-y-3 mb-8 border border-slate-200">
                <div className="flex justify-between items-center text-sm font-bold">
                   <span className="text-slate-500">Từ mới đã học</span>
-                  <span className="text-[#2E3192]">3 từ</span>
+                  <span className="text-[#1A237E]">3 từ</span>
                </div>
                <div className="flex justify-between items-center text-sm font-bold">
                   <span className="text-slate-500">Từ đã lưu sổ tay</span>
-                  <span className="text-[#2E3192]">2 từ</span>
+                  <span className="text-[#1A237E]">2 từ</span>
                </div>
                <div className="flex justify-between items-center text-sm font-bold pt-3 border-t border-slate-200">
                   <span className="text-slate-500">Kinh nghiệm (XP)</span>
-                  <span className="text-orange-500 flex items-center gap-1">+45 <Zap className="w-3 h-3" /></span>
+                  <span className="text-[#FF9800] flex items-center gap-1">+45 <Zap className="w-3 h-3" /></span>
                </div>
             </div>
 
             <div className="flex gap-4">
-              <button onClick={() => setShowProgressPopup(false)} className="flex-1 py-3 text-slate-500 font-bold hover:bg-slate-50 rounded-xl transition-colors">
+              <button onClick={() => setShowProgressPopup(false)} className="flex-1 py-3 text-slate-500 font-bold hover:bg-slate-50 clip-diagonal transition-colors">
                 Nghỉ ngơi
               </button>
-              <button onClick={() => { setShowProgressPopup(false); navigate(-1); }} className="flex-1 py-3 bg-[#2E3192] text-white font-black rounded-xl hover:bg-[#1E2060] transition-colors shadow-lg">
+              <button onClick={() => { setShowProgressPopup(false); navigate(-1); }} className="flex-1 py-3 bg-[#1A237E] text-white font-heading font-black clip-diagonal hover:bg-[#000051] transition-colors shadow-lg">
                 Học bài tiếp
               </button>
             </div>

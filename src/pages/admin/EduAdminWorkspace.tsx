@@ -1029,7 +1029,9 @@ export default function EduAdminWorkspace() {
       <aside className="w-72 bg-[#1E293B] text-slate-300 flex flex-col sticky top-0 h-screen shadow-2xl">
          <div className="p-8 border-b border-slate-700/50">
             <div className="flex items-center gap-3 mb-2">
-               <div className="w-10 h-10 bg-[#2E3192] rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-500/20">T</div>
+               <div className="w-11 h-11 rounded-xl overflow-hidden shadow-lg shadow-indigo-500/20">
+                  <img src="/assets/images/toxi_edu_logo.png" alt="Logo" className="w-full h-full object-cover" />
+               </div>
                <span className="text-xl font-black text-white tracking-tight">Toxi <span className="text-orange-500">Admin</span></span>
             </div>
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">LMS Ecosystem V4.0</p>

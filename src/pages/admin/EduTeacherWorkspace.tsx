@@ -153,8 +153,8 @@ export default function EduTeacherWorkspace() {
       <aside className="w-72 bg-white border-r border-slate-200 flex flex-col shrink-0 z-20">
         <div className="p-8 border-b border-slate-50">
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-100">
-              <GraduationCap className="text-white w-6 h-6" />
+            <div className="w-11 h-11 rounded-xl overflow-hidden shadow-lg shadow-indigo-100">
+              <img src="/assets/images/toxi_edu_logo.png" alt="Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <h1 className="text-lg font-black tracking-tight">Toxi <span className="text-indigo-600">Teacher</span></h1>

@@ -220,7 +220,9 @@ export default function EduTeacherDashboard() {
         <div className="xl:col-span-3 space-y-6">
            <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm space-y-8 sticky top-10">
               <div className="flex items-center gap-4">
-                 <div className="w-12 h-12 bg-[#2E3192] rounded-2xl flex items-center justify-center text-white shadow-lg"><GraduationCap className="w-7 h-7" /></div>
+                 <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-lg shadow-indigo-100">
+                    <img src="/assets/images/toxi_edu_logo.png" alt="Logo" className="w-full h-full object-cover" />
+                 </div>
                  <div><h2 className="text-lg font-black text-slate-900 leading-none">Edu Management</h2><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Teacher Dashboard</p></div>
               </div>
               {isAdmin && (
