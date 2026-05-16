@@ -65,8 +65,29 @@ export const academicApi = {
     return { enrollment, invoice };
   },
 
+   /**
+   * Submit homework for a student (using lesson_submissions table)
+   */
+  async submitHomework(lessonId: string, userId: string, type: 'record' | 'upload' | 'link' | 'text', content: string, classId?: string) {
+    const { data, error } = await supabase
+      .from('lesson_submissions')
+      .insert({
+        lesson_id: lessonId,
+        user_id: userId,
+        class_id: classId || null,
+        submission_type: type,
+        content: content,
+        status: 'submitted'
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
   /**
-   * Record a grade/achievement for a student
+   * Record a grade/achievement for a student (Teacher action)
    */
   async recordGrade(classId: string, studentId: string, type: string, score: number, notes: string) {
     const { data, error } = await supabase

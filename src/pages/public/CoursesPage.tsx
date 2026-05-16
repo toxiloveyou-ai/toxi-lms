@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { ArrowRight, BookOpen, CheckCircle2, Search, X, Loader2, Star, Clock, Book, Flame, Tag, Timer, Phone, Mail, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { crmApi } from '../lib/api/crm';
-import PublicNav from '../components/PublicNav';
+import { crmApi } from '../../lib/api/crm';
+import PublicNav from '../../components/public/PublicNav';
 
 export default function CoursesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -5,7 +5,7 @@ import {
   User, BookOpen, CheckCircle2, ArrowLeft, 
   Sparkles, Download, Share2
 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../../lib/supabase';
 
 export default function EduVerify() {
   const { code } = useParams();

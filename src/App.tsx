@@ -1,37 +1,37 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Auth & Layout
-import EduLogin from './pages/EduLogin';
-import EduLayout from './components/EduLayout';
+import EduLogin from './pages/edu/EduLogin';
+import EduLayout from './components/edu/EduLayout';
 import EduGuard from './components/auth/EduGuard';
-import EduVerify from './pages/EduVerify';
-import LandingPage from './pages/LandingPage';
-import CoursesPage from './pages/CoursesPage';
-import AboutChinesePage from './pages/AboutChinesePage';
-import MethodPage from './pages/MethodPage';
+import EduVerify from './pages/edu/EduVerify';
+import LandingPage from './pages/public/LandingPage';
+import CoursesPage from './pages/public/CoursesPage';
+import AboutChinesePage from './pages/public/AboutChinesePage';
+import MethodPage from './pages/public/MethodPage';
 
 // Student Pages
-import EduOverview from './pages/EduOverview';
-import EduDashboard from './pages/EduDashboard';
-import EduClassroom from './pages/EduClassroom';
-import EduLibrary from './pages/EduLibrary';
-import EduLesson from './pages/EduLesson';
-import EduPractice from './pages/EduPractice';
-import EduProfile from './pages/EduProfile';
-import EduExplore from './pages/EduExplore';
-import EduReferral from './pages/EduReferral';
-import EduCertificateView from './pages/EduCertificateView';
+import EduOverview from './pages/edu/EduOverview';
+import EduDashboard from './pages/edu/EduDashboard';
+import EduClassroom from './pages/edu/EduClassroom';
+import EduLibrary from './pages/edu/EduLibrary';
+import EduLesson from './pages/edu/EduLesson';
+import EduPractice from './pages/edu/EduPractice';
+import EduProfile from './pages/edu/EduProfile';
+import EduExplore from './pages/edu/EduExplore';
+import EduReferral from './pages/edu/EduReferral';
+import EduCertificateView from './pages/edu/EduCertificateView';
 
 // Learning Logic
-import EduLessonPlayer from './pages/EduLessonPlayer';
-import EduLearn from './pages/EduLearn';
-import EduHomework from './pages/EduHomework';
-import EduExamRoom from './pages/EduExamRoom';
+import EduLessonPlayer from './pages/edu/EduLessonPlayer';
+import EduLearn from './pages/edu/EduLearn';
+import EduHomework from './pages/edu/EduHomework';
+import EduExamRoom from './pages/edu/EduExamRoom';
 
 // Teacher & Admin
-import EduTeacher from './pages/EduTeacher';
-import EduTeacherDashboard from './pages/EduTeacherDashboard';
-import EduAdminWorkspace from './pages/admin/EduAdminWorkspace';
+import EduTeacher from './pages/edu/EduTeacher';
+import EduTeacherDashboard from './pages/edu/EduTeacherDashboard';
+import EduAdminWorkspace from './pages/edu/admin/EduAdminWorkspace';
 
 import { AuthProvider } from './contexts/AuthContext';
 

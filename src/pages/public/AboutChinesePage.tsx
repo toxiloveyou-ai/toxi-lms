@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { BookOpen, Target, Sparkles, Smartphone, ArrowRight, Compass, Trophy, CheckCircle2, GraduationCap, X, Loader2, Phone, Mail, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { crmApi } from '../lib/api/crm';
-import PublicNav from '../components/PublicNav';
+import { crmApi } from '../../lib/api/crm';
+import PublicNav from '../../components/public/PublicNav';
 
 const COURSES = [
   { id: 'hsk-1-2', title: 'Tiếng Trung Giao Tiếp (HSK 1-2)' },

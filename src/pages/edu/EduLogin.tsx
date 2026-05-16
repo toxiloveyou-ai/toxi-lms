@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { Lock, Mail, Phone, User, ArrowRight, Loader2, BookOpen, KeyRound, Globe, Smartphone, Cpu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { validateAccessCode, markCodeAsUsed } from '../constants/eduAccess';
+import { validateAccessCode, markCodeAsUsed } from '../../constants/eduAccess';
 
 export default function EduLogin() {
   const [mode, setMode] = useState<'login' | 'register'>('login');

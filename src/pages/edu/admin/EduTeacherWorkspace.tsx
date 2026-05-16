@@ -10,7 +10,7 @@ import {
   CreditCard, Wallet, RefreshCw, Target, Zap, ShieldCheck,
   Calendar, Clock, Star, MessageCircle, ChevronRight
 } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '../../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 
 // --- TYPES ---
@@ -28,6 +28,8 @@ export default function EduTeacherWorkspace() {
   const [selectedClass, setSelectedClass] = useState<any>(null);
   const [classMembers, setClassMembers] = useState<any[]>([]);
   const [submissions, setSubmissions] = useState<any[]>([]);
+  const [selectedCourseForLessons, setSelectedCourseForLessons] = useState<any>(null);
+  const [lessons, setLessons] = useState<any[]>([]);
   const [stats, setStats] = useState({
     totalStudents: 0,
     activeClasses: 0,
@@ -142,6 +144,23 @@ export default function EduTeacherWorkspace() {
       setActiveTab('student_progress');
     } catch (err) {
       console.error('Error fetching class details:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function fetchCourseLessons(course: any) {
+    setSelectedCourseForLessons(course);
+    setLoading(true);
+    try {
+      const { data } = await supabase
+        .from('course_lessons')
+        .select('*')
+        .eq('course_id', course.id)
+        .order('order_index');
+      setLessons(data || []);
+    } catch (err) {
+      console.error('Error fetching lessons:', err);
     } finally {
       setLoading(false);
     }
@@ -406,34 +425,118 @@ export default function EduTeacherWorkspace() {
                 )}
 
                 {activeTab === 'curriculum' && (
-                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {courses.map((course, i) => (
-                         <div key={i} className="bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all group">
-                            <div className="p-8 space-y-6">
-                               <div className="flex items-center gap-4">
-                                  <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 shadow-inner">
-                                     <BookOpen className="w-7 h-7" />
-                                  </div>
-                                  <div>
-                                     <h3 className="text-base font-black text-slate-900 tracking-tight">{course.title}</h3>
-                                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{course.level} • {course.category}</p>
-                                  </div>
-                               </div>
-                               <p className="text-xs text-slate-500 font-medium leading-relaxed line-clamp-3">{course.description}</p>
-                               <div className="pt-6 border-t border-slate-50 flex items-center justify-between">
-                                  <div className="flex -space-x-2">
-                                     <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[8px] font-black">L1</div>
-                                     <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[8px] font-black">L2</div>
-                                     <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[8px] font-black">+</div>
-                                  </div>
-                                  <button className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-black text-[9px] uppercase tracking-widest shadow-lg hover:scale-105 transition-all">
-                                     Xem bài giảng
-                                  </button>
-                               </div>
-                            </div>
-                         </div>
-                      ))}
-                   </div>
+                    <div className="space-y-8">
+                       {!selectedCourseForLessons ? (
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                             {courses.map((course, i) => (
+                                <div key={i} className="bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all group">
+                                   <div className="p-8 space-y-6">
+                                      <div className="flex items-center gap-4">
+                                         <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 shadow-inner">
+                                            <BookOpen className="w-7 h-7" />
+                                         </div>
+                                         <div>
+                                            <h3 className="text-base font-black text-slate-900 tracking-tight">{course.title}</h3>
+                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{course.level} • {course.category}</p>
+                                         </div>
+                                      </div>
+                                      <p className="text-xs text-slate-500 font-medium leading-relaxed line-clamp-2">{course.description}</p>
+                                      <div className="pt-6 border-t border-slate-50 flex items-center justify-between">
+                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Giáo trình thực chiến</span>
+                                         <button onClick={() => fetchCourseLessons(course)} className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-black text-[9px] uppercase tracking-widest shadow-lg hover:scale-105 transition-all">
+                                            Quản lý bài giảng
+                                         </button>
+                                      </div>
+                                   </div>
+                                </div>
+                             ))}
+                          </div>
+                       ) : (
+                          <div className="space-y-6">
+                             <div className="flex items-center gap-4 mb-8">
+                                <button onClick={() => setSelectedCourseForLessons(null)} className="w-10 h-10 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-slate-500 hover:text-indigo-600 shadow-sm transition-all">
+                                   <ChevronLeft className="w-5 h-5" />
+                                </button>
+                                <div>
+                                   <h3 className="text-2xl font-black text-slate-900">{selectedCourseForLessons.title}</h3>
+                                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Danh sách bài học & Phiếu bài tập</p>
+                                </div>
+                             </div>
+
+                             <div className="space-y-4">
+                                {lessons.map((lesson, idx) => (
+                                   <div key={lesson.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:border-indigo-600/30 transition-all">
+                                      <div className="flex items-start gap-6">
+                                         <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center font-black text-slate-400 shrink-0">{idx + 1}</div>
+                                         <div className="flex-1 space-y-6">
+                                            <div className="flex items-center justify-between">
+                                               <div>
+                                                  <h4 className="text-lg font-black text-slate-900">{lesson.title}</h4>
+                                                  <p className="text-[10px] font-bold text-slate-400 uppercase">{lesson.module_name || 'Chương chưa phân loại'}</p>
+                                               </div>
+                                               <div className="flex items-center gap-2">
+                                                  <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[9px] font-black uppercase">{lesson.content_type}</span>
+                                               </div>
+                                            </div>
+
+                                            <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-4">
+                                               <div className="flex items-center justify-between">
+                                                  <label className="text-[10px] font-black text-[#2E3192] uppercase tracking-widest flex items-center gap-2">
+                                                     <FileText className="w-4 h-4" /> Link Phiếu Bài Tập (Drive/Toxi Upload)
+                                                  </label>
+                                                  {lesson.content_json?.worksheet_url && (
+                                                     <span className="text-[8px] font-black text-emerald-500 uppercase flex items-center gap-1">
+                                                        <CheckCircle2 className="w-3 h-3" /> Đã giao phiếu
+                                                     </span>
+                                                  )}
+                                               </div>
+                                               <div className="flex gap-3">
+                                                  <input 
+                                                     type="text" 
+                                                     defaultValue={lesson.content_json?.worksheet_url || ''}
+                                                     placeholder="Dán link Google Drive hoặc tài liệu tại đây..."
+                                                     className="flex-1 px-5 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold focus:ring-4 focus:ring-indigo-500/5 outline-none"
+                                                     onBlur={async (e) => {
+                                                        const newJson = { ...(lesson.content_json || {}), worksheet_url: e.target.value };
+                                                        const { error } = await supabase.from('course_lessons').update({ content_json: newJson }).eq('id', lesson.id);
+                                                        if (error) alert(`Lỗi: ${error.message}`);
+                                                        else alert('Đã cập nhật phiếu bài tập bài ' + (idx + 1));
+                                                     }}
+                                                  />
+                                                  <label className="px-6 py-3 bg-[#2E3192] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 cursor-pointer hover:bg-black transition-all shadow-lg shadow-indigo-900/20">
+                                                     <Upload className="w-4 h-4" />
+                                                     <input 
+                                                        type="file" 
+                                                        className="hidden" 
+                                                        onChange={async (e) => {
+                                                           const file = e.target.files?.[0];
+                                                           if (!file) return;
+                                                           try {
+                                                              const path = `worksheets/${selectedCourseForLessons.id}/${Date.now()}_${file.name}`;
+                                                              const { error: uploadErr } = await supabase.storage.from('exam-assets').upload(path, file);
+                                                              if (uploadErr) throw uploadErr;
+                                                              const { data: { publicUrl } } = supabase.storage.from('exam-assets').getPublicUrl(path);
+                                                              const newJson = { ...(lesson.content_json || {}), worksheet_url: publicUrl };
+                                                              await supabase.from('course_lessons').update({ content_json: newJson }).eq('id', lesson.id);
+                                                              alert('Đã tải lên & gán phiếu bài tập thành công!');
+                                                              fetchCourseLessons(selectedCourseForLessons);
+                                                           } catch (err: any) {
+                                                              alert(`Lỗi: ${err.message}`);
+                                                           }
+                                                        }}
+                                                     />
+                                                     Upload File
+                                                  </label>
+                                               </div>
+                                            </div>
+                                         </div>
+                                      </div>
+                                   </div>
+                                ))}
+                             </div>
+                          </div>
+                       )}
+                    </div>
                 )}
 
                 {activeTab === 'submissions' && (

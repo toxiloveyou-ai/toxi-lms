@@ -8,11 +8,11 @@ import {
   Layers, Terminal, BarChart3, Kanban, Image as ImageIcon,
   MessageSquare, Copy, Check, Filter, Database,
   UserPlus, UserCheck, Key, ArrowRight, Download, Info, Award,
-  CreditCard, Wallet, RefreshCw, Target, Zap, ShieldCheck, Crop
+  CreditCard, Wallet, RefreshCw, Target, Zap, ShieldCheck, Crop, ExternalLink
 } from 'lucide-react';
 
 
-import { supabase } from '../../lib/supabase';
+import { supabase } from '../../../lib/supabase';
 
 // --- TYPES ---
 type TabType = 'dashboard' | 'courses' | 'enrollments' | 'classes' | 'accounts' | 'access_codes' | 'exams' | 'certificates' | 'toxi_tech' | 'final_project' | 'settings';
@@ -59,6 +59,7 @@ interface Lesson {
     vocabulary?: { word: string; pinyin: string; mean: string }[];
     grammar?: { title: string; note: string }[];
     homework_id?: string;
+    worksheet_url?: string;
   };
   duration_minutes?: number;
 }
@@ -86,6 +87,7 @@ interface Class {
   meeting_url?: string;
   syllabus_url?: string;
   announcements_json?: any[];
+  resources_json?: any[];
 }
 
 // --- MOCK DATA FOR NEW FEATURES ---
@@ -439,6 +441,7 @@ export default function EduAdminWorkspace() {
           meeting_url: selectedClassDetail.meeting_url,
           schedule: selectedClassDetail.schedule,
           announcements_json: selectedClassDetail.announcements_json,
+          resources_json: selectedClassDetail.resources_json,
           status: selectedClassDetail.status
         })
         .eq('id', selectedClassDetail.id);
@@ -1306,6 +1309,21 @@ export default function EduAdminWorkspace() {
                                                             />
                                                          </div>
                                                          <div className="space-y-2">
+                                                            <label className="text-[10px] font-black text-orange-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+                                                               <Download className="w-3.5 h-3.5" /> Link Phiếu Bài Tập (Drive/Direct)
+                                                            </label>
+                                                            <input 
+                                                               type="text"
+                                                               defaultValue={lesson.content_json?.worksheet_url || ''}
+                                                               onBlur={(e) => {
+                                                                  const newJson = { ...(lesson.content_json || {}), worksheet_url: e.target.value };
+                                                                  handleUpdateLesson({...lesson, content_json: newJson});
+                                                               }}
+                                                               placeholder="Dán link Google Drive hoặc file tại đây..."
+                                                               className="w-full px-5 py-3 bg-white border-2 border-orange-100 rounded-2xl text-xs font-black text-orange-600 focus:ring-4 focus:ring-orange-500/5 focus:border-orange-500 outline-none transition-all"
+                                                            />
+                                                         </div>
+                                                         <div className="space-y-2">
                                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-2">
                                                                <Sparkles className="w-3 h-3 text-indigo-500" /> AI Prompt Template
                                                             </label>
@@ -2043,6 +2061,75 @@ export default function EduAdminWorkspace() {
                                  <button className="w-full py-4 border-2 border-dashed border-slate-100 rounded-2xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:border-indigo-500 hover:text-indigo-500 transition-all">
                                     + Ghi nhận buổi 5
                                  </button>
+                              </div>
+                           </div>
+
+                           {/* Phiếu Bài Tập & Tài Liệu */}
+                           <div className="bg-white rounded-[3rem] p-8 border border-slate-200 shadow-sm space-y-8">
+                              <div className="flex items-center justify-between">
+                                 <div>
+                                    <h4 className="text-xs font-black uppercase tracking-widest text-slate-400">Phiếu Bài Tập</h4>
+                                    <p className="text-[9px] font-bold text-slate-300 mt-1 uppercase">Phân phối học liệu cho lớp</p>
+                                 </div>
+                                 <label className="cursor-pointer px-6 py-3 bg-[#2E3192] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-indigo-600/20 hover:scale-105 transition-all flex items-center gap-2">
+                                    <Plus className="w-4 h-4" /> Tải lên mới
+                                    <input 
+                                       type="file" 
+                                       className="hidden" 
+                                       onChange={async (e) => {
+                                          const file = e.target.files?.[0];
+                                          if (!file || !selectedClassDetail) return;
+                                          
+                                          const fileName = `worksheets/${selectedClassDetail.id}/${Date.now()}_${file.name}`;
+                                          const { data, error } = await supabase.storage
+                                             .from('exam-assets')
+                                             .upload(fileName, file);
+                                          
+                                          if (error) {
+                                             alert(`Lỗi upload: ${error.message}`);
+                                             return;
+                                          }
+                                          
+                                          const { data: { publicUrl } } = supabase.storage
+                                             .from('exam-assets')
+                                             .getPublicUrl(fileName);
+                                          
+                                          // Save to syllabus_url
+                                          const { error: dbError } = await supabase
+                                             .from('edu_classes')
+                                             .update({ syllabus_url: publicUrl })
+                                             .eq('id', selectedClassDetail.id);
+                                             
+                                          if (!dbError) {
+                                             setSelectedClassDetail({...selectedClassDetail, syllabus_url: publicUrl});
+                                             alert('Đã cập nhật Phiếu bài tập thành công!');
+                                          }
+                                       }}
+                                    />
+                                 </label>
+                              </div>
+
+                              <div className="grid grid-cols-1 gap-4">
+                                 {selectedClassDetail?.syllabus_url ? (
+                                    <div className="p-5 bg-slate-50 border border-indigo-100 rounded-3xl flex items-center justify-between group hover:border-indigo-400 transition-all">
+                                       <div className="flex items-center gap-4 min-w-0">
+                                          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-[#2E3192] shadow-sm">
+                                             <FileText className="w-6 h-6" />
+                                          </div>
+                                          <div className="min-w-0">
+                                             <p className="font-black text-slate-800 text-sm truncate">Phiếu bài tập hiện tại</p>
+                                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Học viên đã có thể tải về</p>
+                                          </div>
+                                       </div>
+                                       <a href={selectedClassDetail.syllabus_url} target="_blank" rel="noreferrer" className="p-3 text-[#2E3192] hover:bg-indigo-50 rounded-xl transition-colors">
+                                          <ExternalLink className="w-5 h-5" />
+                                       </a>
+                                    </div>
+                                 ) : (
+                                    <div className="py-12 text-center border-2 border-dashed border-slate-100 rounded-[2rem]">
+                                       <p className="text-xs font-black text-slate-300 uppercase tracking-widest">Chưa có phiếu bài tập</p>
+                                    </div>
+                                 )}
                               </div>
                            </div>
                         </div>

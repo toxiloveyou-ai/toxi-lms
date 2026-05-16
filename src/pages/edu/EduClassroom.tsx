@@ -6,10 +6,10 @@ import {
   CheckCircle2, Clock, Megaphone, PlayCircle,
   Sparkles, Target, Zap, Mic, ArrowUpRight,
   ChevronRight, Trophy, Star, Layout, GraduationCap,
-  Calendar, Info, BookOpen, Shield, Download, ArrowRight
+  Calendar, Info, BookOpen, Shield, Download, ArrowRight, Library
 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import { getCourseProgress } from '../lib/api/lessonProgress';
+import { supabase } from '../../lib/supabase';
+import { getCourseProgress } from '../../lib/api/lessonProgress';
 
 export default function EduClassroom() {
   const { classId } = useParams();
@@ -66,7 +66,7 @@ export default function EduClassroom() {
           const prog = await getCourseProgress(user.id, ids);
           setProgressMap(prog);
 
-          // 5. Recent activity (The "Smart" Intelligence part)
+          // 5. Recent activity
           const { data: recentData } = await supabase
             .from('edu_lesson_progress')
             .select('lesson_id, completed_at, xp_earned, score')
@@ -106,10 +106,8 @@ export default function EduClassroom() {
 
   return (
     <div className="min-h-screen bg-[#FDFDFF] font-sans pb-20 selection:bg-indigo-100 overflow-x-hidden">
-      {/* Decorative Background */}
       <div className="absolute top-0 right-0 w-[50%] h-[50%] bg-indigo-50/30 rounded-full blur-[100px] -mr-32 -mt-32 pointer-events-none" />
 
-      {/* TOP HEADER / HERO COMPACT */}
       <section className="bg-white border-b border-slate-200 px-6 py-4 lg:px-12 flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10 shadow-sm">
          <div className="flex items-center gap-5">
             <button onClick={() => navigate('/edu/dashboard')} className="w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-indigo-600 transition-all shadow-sm active:scale-95">
@@ -148,10 +146,7 @@ export default function EduClassroom() {
          </div>
       </section>
 
-      {/* MAIN CONTENT GRID */}
       <div className="max-w-[1600px] mx-auto px-6 lg:px-12 py-8 grid grid-cols-1 xl:grid-cols-12 gap-8">
-        
-        {/* LEFT: CURRICULUM */}
         <div className="xl:col-span-8 space-y-6">
            <div className="bg-white rounded-[2rem] p-6 border border-slate-200 shadow-sm">
               <div className="flex items-center justify-between mb-6">
@@ -159,11 +154,7 @@ export default function EduClassroom() {
                     <PlayCircle className="w-8 h-8 text-indigo-600 p-2 bg-indigo-50 rounded-xl" /> 
                     Hành trình học tập
                  </h2>
-                 <div className="flex gap-2">
-                    <button className="px-4 py-2 bg-slate-50 text-slate-500 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-white border border-transparent hover:border-slate-100 transition-all">Lọc bài học</button>
-                 </div>
               </div>
-
               <div className="grid grid-cols-1 gap-3">
                  {lessons.map((lesson, idx) => {
                     const prog = progressMap[lesson.id];
@@ -181,10 +172,6 @@ export default function EduClassroom() {
                                    {lesson.lesson_type === 'video' ? <Video className="w-3 h-3 text-indigo-500" /> : <FileText className="w-3 h-3 text-orange-500" />}
                                    {lesson.lesson_type || 'Interactive'}
                                 </span>
-                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                                   <Clock className="w-3 h-3" /> {lesson.duration_minutes || 0} phút
-                                </span>
-                                {isCompleted && <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest flex items-center gap-1"><Zap className="w-3 h-3 fill-current" /> +{lesson.xp_reward || 100} XP</span>}
                              </div>
                           </div>
                           <ChevronRight className="w-5 h-5 text-slate-200 group-hover:text-indigo-600 transition-all" />
@@ -193,112 +180,68 @@ export default function EduClassroom() {
                  })}
               </div>
            </div>
-
-           {/* ASSIGNMENTS & RECENT ACTIVITY */}
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Assignments Widget */}
-              <div className="bg-white p-6 rounded-[2rem] border-2 border-orange-100 shadow-sm relative overflow-hidden group">
-                 <div className="absolute top-0 right-0 px-4 py-1.5 bg-orange-500 text-white text-[8px] font-black uppercase tracking-widest rounded-bl-xl shadow-lg">Mới nhất</div>
-                 <div className="flex items-center gap-4 mb-4">
-                    <div className="w-10 h-10 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center"><Mic className="w-5 h-5" /></div>
-                    <h3 className="font-black text-sm text-slate-900">Bài tập ghi âm bài 5</h3>
-                 </div>
-                 <p className="text-[10px] text-slate-500 font-bold mb-4">Hạn nộp: <span className="text-orange-600">23:59 Hôm nay</span></p>
-                 <button className="w-full py-3 bg-slate-900 text-white rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-black transition-all">Làm bài ngay</button>
-              </div>
-
-              {/* Recent Activity Widget (Intelligence Restored) */}
-              <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm group">
-                 <div className="flex items-center gap-4 mb-4">
-                    <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center"><Trophy className="w-5 h-5" /></div>
-                    <h3 className="font-black text-sm text-slate-900">Hoạt động gần đây</h3>
-                 </div>
-                 <div className="space-y-3">
-                    {recentActivity.length > 0 ? recentActivity.map((act, i) => (
-                       <div key={i} className="flex items-center justify-between p-2 bg-slate-50/50 rounded-xl border border-slate-100">
-                          <div className="min-w-0">
-                             <p className="text-[10px] font-black text-slate-800 truncate">{act.title}</p>
-                             <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">{new Date(act.completed_at).toLocaleDateString('vi-VN')}</p>
-                          </div>
-                          <div className="text-right">
-                             <p className="text-[9px] font-black text-emerald-600">+{act.xp_earned} XP</p>
-                          </div>
-                       </div>
-                    )) : (
-                       <p className="text-[10px] text-slate-400 font-bold text-center py-4">Chưa có hoạt động mới</p>
-                    )}
-                 </div>
-              </div>
-           </div>
         </div>
 
-        {/* RIGHT: WIDGETS */}
         <div className="xl:col-span-4 space-y-6">
            {/* ANNOUNCEMENTS */}
-           <div className="bg-white rounded-[2rem] p-6 border border-slate-200 shadow-sm overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 rounded-full blur-2xl -mr-16 -mt-16" />
+           <div className="bg-white rounded-[2rem] p-6 border border-slate-200 shadow-sm relative">
               <div className="flex items-center gap-3 mb-6 relative z-10">
                  <div className="w-9 h-9 bg-orange-500 text-white rounded-xl flex items-center justify-center shadow-lg"><Bell className="w-4.5 h-4.5" /></div>
                  <h3 className="text-base font-black tracking-tight">Thông báo lớp</h3>
               </div>
-              <div className="space-y-3 relative z-10 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
+              <div className="space-y-3 relative z-10">
                  {announcements.map((ann, i) => (
-                    <div key={i} className="p-4 bg-slate-50/50 hover:bg-white border border-slate-100 rounded-2xl transition-all group cursor-pointer">
+                    <div key={i} className="p-4 bg-slate-50/50 border border-slate-100 rounded-2xl">
                        <p className="text-[10px] font-black text-orange-600 mb-1">{ann.title}</p>
-                       <p className="text-[11px] text-slate-600 font-bold leading-relaxed line-clamp-2">{ann.content}</p>
-                       <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
-                          <span className="text-[8px] font-black text-slate-300 uppercase">{new Date(ann.created_at).toLocaleDateString('vi-VN')}</span>
-                          <ArrowRight className="w-3.5 h-3.5 text-slate-200 group-hover:text-orange-500 transition-all" />
-                       </div>
+                       <p className="text-[11px] text-slate-600 font-bold leading-relaxed">{ann.content}</p>
                     </div>
                  ))}
-              </div>
-           </div>
-
-           {/* DNA ANALYTICS */}
-           <div className="bg-[#161922] rounded-[2rem] p-6 text-white border border-white/5 shadow-xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-[60px] -mr-16 -mt-16" />
-              <div className="relative z-10 space-y-6">
-                 <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 bg-white/5 backdrop-blur-xl rounded-xl flex items-center justify-center border border-white/10 shadow-lg"><Sparkles className="w-5 h-5 text-indigo-400" /></div>
-                    <h3 className="text-base font-black tracking-tight">Toxi AI Insight</h3>
-                 </div>
-                 <div className="p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl">
-                    <p className="text-[11px] font-bold text-indigo-100 leading-relaxed italic">
-                       "Hệ thống nhận thấy bạn đang tiến bộ rất nhanh ở phần Ngữ pháp bài 3. Hãy thử thách thêm phần Roleplay bài 4 nhé!"
-                    </p>
-                 </div>
-                 <div className="grid grid-cols-2 gap-3">
-                    <div className="p-4 bg-white/5 rounded-2xl border border-white/10 text-center">
-                       <p className="text-[8px] font-black text-white/30 uppercase tracking-widest mb-1">Cấp độ học</p>
-                       <p className="text-sm font-black text-emerald-400">Tích cực</p>
-                    </div>
-                    <div className="p-4 bg-white/5 rounded-2xl border border-white/10 text-center">
-                       <p className="text-[8px] font-black text-white/30 uppercase tracking-widest mb-1">Hạng lớp</p>
-                       <p className="text-sm font-black text-orange-400">Top 5</p>
-                    </div>
-                 </div>
-                 <button className="w-full py-3.5 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-indigo-600/20 hover:scale-105 active:scale-95 transition-all">Phân tích DNA ngôn ngữ</button>
               </div>
            </div>
 
            {/* RESOURCES */}
            <div className="bg-white rounded-[2rem] p-6 border border-slate-200 shadow-sm space-y-6">
-              <div className="flex items-center gap-3">
-                 <div className="w-9 h-9 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center"><Download className="w-5 h-5" /></div>
-                 <h3 className="text-base font-black tracking-tight">Thư viện số</h3>
+              <div className="flex items-center justify-between">
+                 <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center"><Library className="w-5 h-5" /></div>
+                    <h3 className="text-base font-black tracking-tight">Thư viện số</h3>
+                 </div>
+                 <span className="px-2 py-0.5 bg-indigo-50 text-[#2E3192] rounded-md text-[8px] font-black uppercase">Lesson Files</span>
               </div>
-              <div className="space-y-4">
-                 {[
-                    { title: 'Giáo trình bài khóa', icon: FileText, color: 'text-blue-500' },
-                    { title: 'Audio luyện nghe', icon: Mic, color: 'text-purple-500' },
-                    { title: 'Flashcards từ vựng', icon: Target, color: 'text-orange-500' }
-                 ].map((res, i) => (
-                    <div key={i} className="flex items-center gap-3 group cursor-pointer p-2 hover:bg-slate-50 rounded-xl transition-all">
-                       <res.icon className={`w-4.5 h-4.5 ${res.color}`} />
-                       <span className="text-[11px] font-black text-slate-700 group-hover:text-indigo-600">{res.title}</span>
-                    </div>
+              <div className="space-y-3">
+                 {/* Class Main Syllabus */}
+                 {cls?.syllabus_url && (
+                    <a href={cls.syllabus_url} target="_blank" rel="noreferrer" className="flex items-center gap-3 group cursor-pointer p-4 bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 rounded-2xl transition-all hover:shadow-lg">
+                       <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#2E3192] shadow-sm group-hover:bg-[#2E3192] group-hover:text-white transition-all">
+                          <Download className="w-5 h-5" />
+                       </div>
+                       <div className="min-w-0">
+                          <p className="text-[11px] font-black text-[#2E3192] uppercase">Giáo trình lớp</p>
+                          <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Syllabus tổng quát</p>
+                       </div>
+                    </a>
+                 )}
+
+                 {/* Lesson Specific Worksheets */}
+                 {lessons.filter(l => l.content_json?.worksheet_url).map((l, idx) => (
+                    <a key={l.id} href={l.content_json.worksheet_url} target="_blank" rel="noreferrer" className="flex items-center gap-3 group p-3 bg-slate-50/50 hover:bg-white border border-slate-100 rounded-2xl transition-all">
+                       <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-orange-400 border border-slate-100 group-hover:bg-orange-400 group-hover:text-white transition-all">
+                          <BookOpen className="w-4 h-4" />
+                       </div>
+                       <div className="min-w-0 flex-1">
+                          <p className="text-[10px] font-black text-slate-700 truncate">{l.title}</p>
+                          <p className="text-[7px] font-black text-slate-400 uppercase">Phiếu bài tập • {idx + 1}</p>
+                       </div>
+                       <Download className="w-3 h-3 text-slate-300 group-hover:text-[#2E3192]" />
+                    </a>
                  ))}
+
+                 {(!cls?.syllabus_url && !lessons.some(l => l.content_json?.worksheet_url)) && (
+                    <div className="py-10 text-center">
+                       <Info className="w-8 h-8 text-slate-200 mx-auto mb-2" />
+                       <p className="text-[10px] text-slate-300 font-black uppercase tracking-widest">Chưa có tài liệu</p>
+                    </div>
+                 )}
               </div>
            </div>
         </div>

@@ -8,8 +8,8 @@ import {
   X, Info, Heart, CreditCard, Copy, Check, Download,
   Loader2, ExternalLink, QrCode
 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import { paymentApi } from '../lib/api/payment';
+import { supabase } from '../../lib/supabase';
+import { paymentApi } from '../../lib/api/payment';
 
 // Mock Data for Teachers
 const TEACHERS = [

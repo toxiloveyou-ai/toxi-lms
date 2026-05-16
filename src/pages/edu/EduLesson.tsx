@@ -7,7 +7,7 @@ import {
   Video, FileText, ChevronLeft, Volume2,
   Bookmark, Share2, Info, Star, Award,
   Clock, ShieldCheck, MessageCircle, MoreVertical,
-  Maximize2, Flame, Mic
+  Maximize2, Flame, Mic, ExternalLink, Download
 } from 'lucide-react';
 
 // Sub-step types
@@ -289,6 +289,29 @@ export default function EduLesson() {
                          1. Cách dùng trạng từ thời gian <strong>刚才 (gāngcái)</strong>: dùng để chỉ một thời gian rất ngắn trước thời điểm nói. <br/>
                          2. Cách diễn đạt giải quyết vấn đề trong công việc bằng động từ <strong>解决 (jiějué)</strong>.
                        </p>
+                    </div>
+                  )}
+                  {activeTab === 'resources' && (
+                    <div className="space-y-6">
+                       <div className="flex items-center justify-between p-6 bg-slate-50 rounded-[2rem] border border-slate-100 group hover:border-student-primary transition-all">
+                          <div className="flex items-center gap-4">
+                             <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-student-primary shadow-sm border border-slate-100 group-hover:scale-110 transition-transform">
+                                <FileText className="w-7 h-7" />
+                             </div>
+                             <div>
+                                <h4 className="font-black text-slate-900">Phiếu Bài Tập Bài {id?.replace(/\D/g, '') || '4'}</h4>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">PDF • 1.2 MB</p>
+                             </div>
+                          </div>
+                          <div className="flex gap-3">
+                             <button className="p-3 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-student-primary hover:border-student-primary transition-all shadow-sm">
+                                <Download className="w-5 h-5" />
+                             </button>
+                             <button onClick={() => navigate(`/edu/homework/${id}`)} className="px-6 py-3 bg-student-primary text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-student-primary/20 hover:scale-105 transition-all flex items-center gap-2">
+                                <ExternalLink className="w-4 h-4" /> Nộp bài ngay
+                             </button>
+                          </div>
+                       </div>
                     </div>
                   )}
                </div>

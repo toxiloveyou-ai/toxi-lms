@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { ArrowRight, BookOpen, CheckCircle2, Target, Sparkles, Smartphone, Star, X, Loader2, Phone, Mail, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { crmApi } from '../lib/api/crm';
-import PublicNav from '../components/PublicNav';
+import { crmApi } from '../../lib/api/crm';
+import PublicNav from '../../components/public/PublicNav';
 
 const COURSES = [
   { id: 'hsk-1-2', title: 'Tiếng Trung Giao Tiếp (HSK 1-2)', level: 'Sơ cấp', duration: '3 tháng', desc: 'Phát âm chuẩn Pinyin, từ vựng sinh hoạt, giao tiếp cơ bản hàng ngày.' },

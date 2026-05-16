@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  ArrowLeft, Clock, Upload, Mic, Play, 
-  CheckCircle2, AlertCircle, FileText, Send, Paperclip,
-  Brain, Volume2, BookOpen, MessageSquare, Trash2, StopCircle
+   ArrowLeft, Clock, Upload, Mic, Play, 
+   CheckCircle2, AlertCircle, FileText, Send, Paperclip,
+   Brain, Volume2, BookOpen, MessageSquare, Trash2, StopCircle, ExternalLink,
+   Info, Loader2, Download, Calendar
 } from 'lucide-react';
+import { academicApi } from '../../lib/api/academic';
+import { supabase } from '../../lib/supabase';
 
 export default function EduHomework() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [submissionType, setSubmissionType] = useState<'upload' | 'record' | 'text'>('record');
+  const [submissionType, setSubmissionType] = useState<'upload' | 'record' | 'text' | 'link'>('record');
+  const [googleDriveLink, setGoogleDriveLink] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   // Audio Recording States
   const [isRecording, setIsRecording] = useState(false);
@@ -19,20 +24,67 @@ export default function EduHomework() {
   const [recordedAudio, setRecordedAudio] = useState<boolean>(false); // Mock audio presence
   const [aiFeedback, setAiFeedback] = useState<any>(null);
   const [isAiGrading, setIsAiGrading] = useState(false);
+  const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [cls, setCls] = useState<any>(null);
   
   // MOCK HW DATA
   const hw = {
-    title: 'Nộp file ghi âm Bài khóa 4',
+    title: 'Nộp bài tập Bài 4 - Google Drive',
     class: 'Lớp Tối 2-4-6',
-    deadline: '23:59 Hôm nay',
-    description: 'Nghe Audio mẫu trong tab Ôn luyện, sau đó tự đọc lại toàn bộ Đoạn hội thoại 1 (Trang 45, Giáo trình Tongxiao). Thu âm rõ ràng, đặc biệt chú ý thanh 4.',
-    type: 'audio',
+    deadline: 'Trước buổi học 2 tiếng',
+    sessionTime: '20:00 Hôm nay', // Example session time
+    description: 'Vui lòng hoàn thành bài tập viết vào file Doc hoặc PDF, tải lên Google Drive cá nhân và nộp link tại đây. Đảm bảo đã mở quyền truy cập cho giáo viên.',
+    type: 'link',
     referenceText: [
        { pinyin: 'Nǐ hǎo, zhè shì nǐ de fángkǎ.', hanzi: '你好，这是你的房卡。', vi: 'Xin chào, đây là thẻ phòng của bạn.' },
-       { pinyin: 'Xièxiè. Qǐngwèn zǎocān zài jǐ lóu?', hanzi: '谢谢。请问早餐在几楼？', vi: 'Cảm ơn. Cho hỏi bữa sáng ở tầng mấy?' },
-       { pinyin: 'Zǎocān zài èr lóu, qī diǎn zhì jiǔ diǎn.', hanzi: '早餐在二楼，七点至九点。', vi: 'Bữa sáng ở tầng 2, từ 7 giờ đến 9 giờ.' }
+       { pinyin: 'Xièxiè. Qǐngwèn zǎocān zài jǐ lóu?', hanzi: '谢谢。请问早餐 en zài jǐ lóu?', vi: 'Cảm ơn. Cho hỏi bữa sáng ở tầng mấy?' },
+       { pinyin: 'Zǎocān zài èr lóu, qī diǎn zhì jiǔ diǎn.', hanzi: '早餐在二楼，七点至九点.', vi: 'Bữa sáng ở tầng 2, từ 7 giờ đến 9 giờ.' }
     ]
   };
+
+  const [lesson, setLesson] = useState<any>(null);
+  
+  useEffect(() => {
+    fetchClassInfo();
+    fetchLessonInfo();
+  }, [id]);
+
+  async function fetchLessonInfo() {
+    try {
+      const { data, error } = await supabase
+        .from('course_lessons')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (data) {
+        setLesson(data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function fetchClassInfo() {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: member } = await supabase
+        .from('edu_class_members')
+        .select('*, edu_classes(*)')
+        .eq('student_id', user.id)
+        .maybeSingle();
+      
+      if (member?.edu_classes) {
+        setCls(member.edu_classes);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   // Timer logic for recording mock
   useEffect(() => {
@@ -78,12 +130,51 @@ export default function EduHomework() {
     }, 2000);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    // Deadline check logic (Dynamic for testing)
+    const now = new Date();
+    const sessionDate = new Date();
+    sessionDate.setHours(23, 59, 59, 0); // Set to end of day for testing
+    
+    const diffMs = sessionDate.getTime() - now.getTime();
+    const diffHours = diffMs / (1000 * 60 * 60);
+
+    // In production, we would fetch the actual class schedule
+    if (diffHours < 0) {
+      setError("Rất tiếc! Đã quá hạn nộp bài.");
+      return;
+    }
+
+    if (submissionType === 'link' && (!googleDriveLink || !googleDriveLink.includes('drive.google.com'))) {
+      setError("Vui lòng nhập link Google Drive hợp lệ.");
+      return;
+    }
+
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    setError(null);
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Bạn cần đăng nhập để nộp bài.");
+
+      let content = '';
+      if (submissionType === 'link') content = googleDriveLink;
+      else if (submissionType === 'record') content = 'Audio Submission';
+      else if (submissionType === 'upload') content = uploadedFileUrl || 'File Submission';
+      
+      await academicApi.submitHomework(
+        id || 'unknown',
+        user.id,
+        submissionType,
+        content
+      );
+
       setIsSubmitted(true);
-    }, 1500);
+    } catch (err: any) {
+      setError(err.message || "Lỗi khi nộp bài. Vui lòng thử lại.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isSubmitted) {
@@ -113,9 +204,12 @@ export default function EduHomework() {
              <ArrowLeft className="w-4 h-4" /> Thoát
            </button>
            <div className="h-8 w-px bg-slate-200 mx-6"></div>
-           <div className="flex items-center gap-3">
-              <span className="px-3 py-1 bg-orange-100 text-orange-600 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
+            <div className="flex items-center gap-3">
+              <span className={`px-3 py-1 ${error ? 'bg-red-100 text-red-600' : 'bg-orange-100 text-orange-600'} rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1`}>
                  <Clock className="w-3 h-3" /> Hạn: {hw.deadline}
+              </span>
+              <span className="px-3 py-1 bg-indigo-100 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
+                 <Calendar className="w-3 h-3" /> Buổi học: {hw.sessionTime}
               </span>
            </div>
         </div>
@@ -132,7 +226,7 @@ export default function EduHomework() {
             <div className="max-w-xl mx-auto space-y-8">
                
                <div>
-                  <h1 className="text-3xl font-black text-[#2E3192] leading-snug mb-4">{hw.title}</h1>
+                  <h1 className="text-3xl font-black text-[#2E3192] leading-snug mb-4">{lesson?.title || hw.title}</h1>
                   <div className="p-5 bg-blue-50 border border-blue-100 rounded-2xl text-slate-600 text-sm leading-relaxed font-medium">
                      <strong className="text-blue-800">📌 Hướng dẫn:</strong> {hw.description}
                   </div>
@@ -142,6 +236,25 @@ export default function EduHomework() {
                   <h3 className="font-black text-lg flex items-center gap-2">
                      <FileText className="w-5 h-5 text-orange-500" /> Nội dung tham khảo
                   </h3>
+                  
+                  {/* Worksheet Download Area */}
+                  {(lesson?.content_json?.worksheet_url || cls?.syllabus_url) && (
+                     <div className="p-6 bg-indigo-50 border border-indigo-100 rounded-3xl flex items-center justify-between mb-6 group hover:border-[#2E3192]/20 transition-all">
+                        <div className="flex items-center gap-4">
+                           <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-[#2E3192] shadow-sm">
+                              <Download className="w-6 h-6" />
+                           </div>
+                           <div>
+                              <p className="text-xs font-black text-[#2E3192] uppercase">Tải Phiếu Bài Tập</p>
+                              <p className="text-[10px] font-bold text-slate-400">File đính kèm cho bài học này</p>
+                           </div>
+                        </div>
+                        <a href={lesson?.content_json?.worksheet_url || cls.syllabus_url} target="_blank" rel="noreferrer" className="px-6 py-3 bg-[#2E3192] text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-indigo-900/10">
+                           Tải xuống
+                        </a>
+                     </div>
+                  )}
+
                   <div className="bg-white p-6 rounded-3xl border border-[#EADBC8] shadow-sm space-y-6">
                      {hw.referenceText.map((line, idx) => (
                         <div key={idx} className="group relative">
@@ -168,10 +281,20 @@ export default function EduHomework() {
                   <button onClick={() => setSubmissionType('record')} className={`flex-1 py-4 px-4 rounded-2xl border-2 font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${submissionType === 'record' ? 'border-[#2E3192] bg-[#2E3192]/5 text-[#2E3192]' : 'border-slate-100 text-slate-400 hover:border-slate-300'}`}>
                      <Mic className="w-5 h-5" /> Ghi âm
                   </button>
-                  <button onClick={() => setSubmissionType('upload')} className={`flex-1 py-4 px-4 rounded-2xl border-2 font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${submissionType === 'upload' ? 'border-[#2E3192] bg-[#2E3192]/5 text-[#2E3192]' : 'border-slate-100 text-slate-400 hover:border-slate-300'}`}>
-                     <Upload className="w-5 h-5" /> Tải File
-                  </button>
-               </div>
+                   <button onClick={() => setSubmissionType('upload')} className={`flex-1 py-4 px-4 rounded-2xl border-2 font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${submissionType === 'upload' ? 'border-[#2E3192] bg-[#2E3192]/5 text-[#2E3192]' : 'border-slate-100 text-slate-400 hover:border-slate-300'}`}>
+                     <Upload className="w-5 h-5" /> File
+                   </button>
+                   <button onClick={() => setSubmissionType('link')} className={`flex-1 py-4 px-4 rounded-2xl border-2 font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${submissionType === 'link' ? 'border-[#2E3192] bg-[#2E3192]/5 text-[#2E3192]' : 'border-slate-100 text-slate-400 hover:border-slate-300'}`}>
+                     <Paperclip className="w-5 h-5" /> Link Drive
+                   </button>
+                </div>
+
+                {error && (
+                  <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3 animate-in slide-in-from-top-2">
+                    <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                    <p className="text-xs font-bold text-red-600 leading-relaxed">{error}</p>
+                  </div>
+                )}
 
                {/* RECORDING UI */}
                {submissionType === 'record' && (
@@ -272,24 +395,116 @@ export default function EduHomework() {
 
                {/* UPLOAD UI */}
                {submissionType === 'upload' && (
-                  <div className="flex-1 flex flex-col justify-center items-center bg-slate-50 border-2 border-dashed border-slate-300 rounded-[2.5rem] p-10 hover:border-[#2E3192] hover:bg-blue-50/50 transition-colors cursor-pointer group">
-                     <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-slate-400 group-hover:text-[#2E3192] shadow-sm mb-6 transition-colors">
-                        <Paperclip className="w-8 h-8" />
+                  <label className={`flex-1 flex flex-col justify-center items-center bg-slate-50 border-2 border-dashed rounded-[2.5rem] p-10 transition-colors cursor-pointer group animate-in fade-in slide-in-from-right-8 ${uploadedFileUrl ? 'border-emerald-400 bg-emerald-50' : 'border-slate-300 hover:border-[#2E3192] hover:bg-blue-50/50'}`}>
+                     <input 
+                        type="file" 
+                        className="hidden" 
+                        onChange={async (e) => {
+                           const file = e.target.files?.[0];
+                           if (!file) return;
+                           
+                           setIsUploading(true);
+                           setError(null);
+                           
+                           try {
+                              const { data: { user } } = await supabase.auth.getUser();
+                              if (!user) throw new Error("Vui lòng đăng nhập.");
+                              
+                              const fileName = `submissions/${user.id}/${Date.now()}_${file.name}`;
+                              const { error: uploadError } = await supabase.storage
+                                 .from('exam-assets')
+                                 .upload(fileName, file);
+                              
+                              if (uploadError) throw uploadError;
+                              
+                              const { data: { publicUrl } } = supabase.storage
+                                 .from('exam-assets')
+                                 .getPublicUrl(fileName);
+                              
+                              setUploadedFileUrl(publicUrl);
+                              setUploadedFileName(file.name);
+                           } catch (err: any) {
+                              setError(err.message || "Lỗi khi tải file.");
+                           } finally {
+                              setIsUploading(false);
+                           }
+                        }}
+                     />
+                     <div className={`w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-sm mb-6 transition-colors ${uploadedFileUrl ? 'text-emerald-500' : 'text-slate-400 group-hover:text-[#2E3192]'}`}>
+                        {isUploading ? <Loader2 className="w-8 h-8 animate-spin" /> : (uploadedFileUrl ? <CheckCircle2 className="w-10 h-10" /> : <Paperclip className="w-8 h-8" />)}
                      </div>
-                     <p className="font-black text-xl text-[#2E3192] mb-2">Kéo thả File vào đây</p>
+                     <p className="font-black text-xl text-[#2E3192] mb-2">{uploadedFileName || 'Chọn File bài tập'}</p>
                      <p className="text-sm font-medium text-slate-400 text-center max-w-xs">
-                        Hỗ trợ ảnh (.jpg, .png) để nộp vở viết, hoặc file âm thanh/video (.mp3, .mp4). Tối đa 50MB.
+                        {uploadedFileUrl ? 'Sẵn sàng để nộp!' : 'Hỗ trợ ảnh (.jpg, .png) để nộp vở viết, hoặc file âm thanh/video (.mp3, .mp4). Tối đa 50MB.'}
                      </p>
-                  </div>
+                  </label>
                )}
+
+                {/* LINK UI */}
+                {submissionType === 'link' && (
+                  <div className="flex-1 flex flex-col justify-center animate-in fade-in slide-in-from-right-8">
+                    <div className="bg-white rounded-[2.5rem] border-2 border-[#EADBC8] p-8 shadow-sm">
+                      <div className="flex items-center gap-4 mb-8">
+                        <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
+                          <ExternalLink className="w-8 h-8" />
+                        </div>
+                        <div>
+                          <h3 className="font-black text-xl text-[#2E3192]">Dán Link Google Drive</h3>
+                          <p className="text-xs font-medium text-slate-400">Đảm bảo link ở chế độ "Bất kỳ ai có liên kết đều có thể xem"</p>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div className="relative">
+                          <input 
+                            type="text" 
+                            value={googleDriveLink}
+                            onChange={(e) => {
+                              setGoogleDriveLink(e.target.value);
+                              setError(null);
+                            }}
+                            placeholder="https://drive.google.com/..."
+                            className="w-full px-6 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-[#2E3192] focus:bg-white focus:border-[#2E3192] outline-none transition-all"
+                          />
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                             <p className="text-[10px] font-black text-emerald-600 uppercase mb-1">Trạng thái Link</p>
+                             <p className="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
+                               {googleDriveLink.includes('drive.google.com') ? <CheckCircle2 className="w-3 h-3" /> : <div className="w-1.5 h-1.5 bg-slate-300 rounded-full" />}
+                               {googleDriveLink.includes('drive.google.com') ? 'Định dạng hợp lệ' : 'Đang chờ nhập'}
+                             </p>
+                          </div>
+                          <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
+                             <p className="text-[10px] font-black text-indigo-600 uppercase mb-1">Thời gian nộp</p>
+                             <p className="text-xs font-bold text-indigo-700 flex items-center gap-1.5">
+                               <Clock className="w-3 h-3" /> Đúng hạn
+                             </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-8 p-6 bg-blue-50 border border-blue-100 rounded-[2rem] flex items-start gap-4">
+                       <Info className="w-6 h-6 text-blue-500 shrink-0 mt-1" />
+                       <div className="space-y-1">
+                          <p className="text-xs font-black text-blue-800">Mẹo nhỏ Toxi AI:</p>
+                          <p className="text-xs font-medium text-blue-700 leading-relaxed">
+                            Nộp bài trước ít nhất 2 tiếng giúp giáo viên có thời gian xem kỹ lỗi sai của bạn và chuẩn bị tài liệu sửa lỗi riêng cho bạn trong buổi học.
+                          </p>
+                       </div>
+                    </div>
+                  </div>
+                )}
 
                {/* SUBMIT BUTTON */}
                <div className="shrink-0 mt-8">
-                  <button 
-                     onClick={handleSubmit} 
-                     disabled={isSubmitting || (submissionType === 'record' && !recordedAudio)}
-                     className="w-full py-5 bg-gradient-to-r from-orange-400 to-pink-500 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:shadow-[0_10px_30px_rgba(249,115,22,0.3)] hover:scale-[1.02] transition-all flex items-center justify-center gap-3 disabled:opacity-30 disabled:hover:scale-100 disabled:hover:shadow-none"
-                  >
+                   <button 
+                      onClick={handleSubmit} 
+                      disabled={isSubmitting || (submissionType === 'record' && !recordedAudio) || (submissionType === 'link' && !googleDriveLink)}
+                      className="w-full py-5 bg-gradient-to-r from-orange-400 to-pink-500 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:shadow-[0_10px_30px_rgba(249,115,22,0.3)] hover:scale-[1.02] transition-all flex items-center justify-center gap-3 disabled:opacity-30 disabled:hover:scale-100 disabled:hover:shadow-none"
+                   >
                      {isSubmitting ? 'Đang mã hóa & gửi...' : 'Nộp bài chính thức'} <Send className="w-5 h-5" />
                   </button>
                   <p className="text-center text-xs font-bold text-slate-400 mt-4 uppercase tracking-widest flex items-center justify-center gap-1">

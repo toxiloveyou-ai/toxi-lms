@@ -4,8 +4,8 @@ import {
   ChevronRight, Sparkles, Zap, Trophy, 
   ArrowUpRight, Heart, Star, MessageCircle
 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function EduReferral() {
   const { user } = useAuth();

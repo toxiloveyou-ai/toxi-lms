@@ -13,8 +13,8 @@ import {
   ArrowRight
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { getFinalExam, submitExamResult, issueCertificate } from '../lib/api/eduLifecycle';
-import { supabase } from '../lib/supabase';
+import { getFinalExam, submitExamResult, issueCertificate } from '../../lib/api/eduLifecycle';
+import { supabase } from '../../lib/supabase';
 
 
 interface Question {
