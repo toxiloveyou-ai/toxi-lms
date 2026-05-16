@@ -5,6 +5,10 @@ import EduLogin from './pages/EduLogin';
 import EduLayout from './components/EduLayout';
 import EduGuard from './components/auth/EduGuard';
 import EduVerify from './pages/EduVerify';
+import LandingPage from './pages/LandingPage';
+import CoursesPage from './pages/CoursesPage';
+import AboutChinesePage from './pages/AboutChinesePage';
+import MethodPage from './pages/MethodPage';
 
 // Student Pages
 import EduOverview from './pages/EduOverview';
@@ -68,8 +72,11 @@ function App() {
         </Route>
 
         {/* Fallback */}
-        <Route path="/" element={<Navigate to="/edu/overview" replace />} />
-        <Route path="*" element={<Navigate to="/edu/login" replace />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/courses" element={<CoursesPage />} />
+        <Route path="/about/chinese" element={<AboutChinesePage />} />
+        <Route path="/method" element={<MethodPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
     </AuthProvider>
