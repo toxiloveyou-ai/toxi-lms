@@ -252,9 +252,21 @@ export async function createLearningDiaryEntry(userId: string, entry: { title: s
 }
 
 /**
- * Cập nhật thông tin cá nhân
+ * Cập nhật thông tin cá nhân và mục tiêu học tập
  */
-export async function updateProfile(userId: string, updates: Partial<{ full_name: string, avatar_url: string, bio: string, goals: string }>) {
+export async function updateProfile(
+  userId: string, 
+  updates: Partial<{ 
+    full_name: string; 
+    avatar_url: string; 
+    bio: string; 
+    goals: string;
+    phone: string;
+    target_exam: string;
+    exam_date: string | null;
+    target_score: number | null;
+  }>
+) {
   const { data, error } = await supabase
     .from('toxi_profiles')
     .update(updates)
