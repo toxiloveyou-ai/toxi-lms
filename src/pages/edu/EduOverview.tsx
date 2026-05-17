@@ -390,8 +390,8 @@ export default function EduOverview() {
                             "{aiTip || "Đang phân tích xu hướng học tập của bạn để đưa ra lời khuyên tối ưu nhất..."}"
                          </p>
                       </div>
-                      <button className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:bg-[#2E3192] transition-all flex items-center justify-center gap-3 group/tip">
-                         Mở rộng DNA <TrendingUp className="w-4 h-4 group-hover/tip:-translate-y-0.5 transition-transform" />
+                      <button className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:bg-[#2E3192] transition-all flex items-center justify-center gap-3 group/tip" onClick={() => window.dispatchEvent(new CustomEvent('open-toxi-ai'))}>
+                         Trò chuyện với Cố vấn AI <TrendingUp className="w-4 h-4 group-hover/tip:-translate-y-0.5 transition-transform" />
                       </button>
                    </div>
                  )}

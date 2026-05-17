@@ -9,14 +9,14 @@ import { deepseekGenerate, deepseekGenerateJSON, deepseekChat, DEEPSEEK_MODELS }
  * - R1 (deepseek-reasoner) -> 10% tác vụ cần phân tích sâu (suy luận tốt).
  */
 
-export type AIProvider = 'gemini' | 'deepseek';
+export type AIProvider = 'gemini' | 'deepseek' | 'tongxiao';
 
 const DEFAULT_PROVIDER: AIProvider = (import.meta.env.VITE_AI_PROVIDER as AIProvider) || 'gemini';
 
 /**
  * [TOXI AI] Quy tắc đảm bảo hiển thị sạch, tránh lỗi ký tự và markdown lạ.
  */
-const CHARACTER_SAFETY_INSTRUCTION = "\n[QUY TẮC KỸ THUẬT: Trả về văn bản chuẩn UTF-8. KHÔNG dùng Markdown như **, #, hoặc ký tự đặc biệt lạ gây lỗi hiển thị.]";
+const CHARACTER_SAFETY_INSTRUCTION = "\n[QUY TẮC KỸ THUẬT: Trả về văn bản chuẩn UTF-8. Hãy sử dụng định dạng bôi đậm ** cho từ khóa quan trọng và dấu gạch đầu dòng - để liệt kê danh sách khi cần thiết để thông tin được rõ ràng, trực quan.]";
 
 
 /**
@@ -29,18 +29,18 @@ export async function aiGenerate(
 ): Promise<string> {
   const dsModel = useReasoner ? DEEPSEEK_MODELS.R1 : DEEPSEEK_MODELS.V3;
   const safePrompt = prompt + CHARACTER_SAFETY_INSTRUCTION;
-  console.log(`[AI Bridge] Using ${provider} (${provider === 'deepseek' ? dsModel : 'flash'}) for text generation...`);
+  console.log(`[AI Bridge] Using ${provider} (${(provider === 'deepseek' || provider === 'tongxiao') ? dsModel : 'flash'}) for text generation...`);
   
   try {
-    if (provider === 'deepseek') {
+    if (provider === 'deepseek' || provider === 'tongxiao') {
       const text = await deepseekGenerate(safePrompt, undefined, dsModel);
-      // [TOXI AI Update] Loại bỏ thẻ <thought> của DeepSeek R1 để không hiển thị cho người dùng
+      // [TOXI AI Update] Loại bỏ thẻ <thought> của R1 để không hiển thị cho người dùng
       return text.replace(/<thought>[\s\S]*?<\/thought>/g, '').trim();
     }
     return await geminiGenerate(safePrompt);
   } catch (error) {
     console.error(`[AI Bridge] ${provider} failed, falling back...`, error);
-    if (provider === 'deepseek') return await geminiGenerate(safePrompt);
+    if (provider === 'deepseek' || provider === 'tongxiao') return await geminiGenerate(safePrompt);
     return await deepseekGenerate(safePrompt, undefined, DEEPSEEK_MODELS.V3);
   }
 }
@@ -54,16 +54,16 @@ export async function aiGenerateJSON<T = any>(
   useReasoner: boolean = false
 ): Promise<T> {
   const dsModel = useReasoner ? DEEPSEEK_MODELS.R1 : DEEPSEEK_MODELS.V3;
-  console.log(`[AI Bridge] Using ${provider} (${provider === 'deepseek' ? dsModel : 'flash'}) for JSON generation...`);
+  console.log(`[AI Bridge] Using ${provider} (${(provider === 'deepseek' || provider === 'tongxiao') ? dsModel : 'flash'}) for JSON generation...`);
 
   try {
-    if (provider === 'deepseek') {
+    if (provider === 'deepseek' || provider === 'tongxiao') {
       return await deepseekGenerateJSON<T>(prompt, undefined, dsModel);
     }
     return await geminiGenerateJSON<T>(prompt);
   } catch (error) {
     console.error(`[AI Bridge] ${provider} JSON failed, falling back...`, error);
-    if (provider === 'deepseek') return await geminiGenerateJSON<T>(prompt);
+    if (provider === 'deepseek' || provider === 'tongxiao') return await geminiGenerateJSON<T>(prompt);
     return await deepseekGenerateJSON<T>(prompt, undefined, DEEPSEEK_MODELS.V3);
   }
 }
@@ -80,22 +80,22 @@ export async function aiChat(
 ): Promise<string> {
   const dsModel = useReasoner ? DEEPSEEK_MODELS.R1 : DEEPSEEK_MODELS.V3;
   const safeSystem = systemInstruction + CHARACTER_SAFETY_INSTRUCTION;
-  console.log(`[AI Bridge] Using ${provider} (${provider === 'deepseek' ? dsModel : 'flash'}) for chat...`);
+  console.log(`[AI Bridge] Using ${provider} (${(provider === 'deepseek' || provider === 'tongxiao') ? dsModel : 'flash'}) for chat...`);
 
   try {
-    if (provider === 'deepseek') {
+    if (provider === 'deepseek' || provider === 'tongxiao') {
       const dsHistory = history.map(h => ({
         role: (h.role === 'model' ? 'assistant' : 'user') as 'assistant' | 'user',
         content: typeof h.parts === 'string' ? h.parts : h.parts?.[0]?.text || ''
       }));
       const text = await deepseekChat(safeSystem, dsHistory, userMessage, dsModel);
-      // [TOXI AI Update] Loại bỏ thẻ <thought> của DeepSeek R1 để không hiển thị cho người dùng
+      // [TOXI AI Update] Loại bỏ thẻ <thought> của R1 để không hiển thị cho người dùng
       return text.replace(/<thought>[\s\S]*?<\/thought>/g, '').trim();
     }
     return await geminiChat(safeSystem, history, userMessage);
   } catch (error) {
     console.error(`[AI Bridge] ${provider} chat failed, falling back...`, error);
-    if (provider === 'deepseek') return await geminiChat(safeSystem, history, userMessage);
+    if (provider === 'deepseek' || provider === 'tongxiao') return await geminiChat(safeSystem, history, userMessage);
     const dsHistory = history.map(h => ({
       role: (h.role === 'model' ? 'assistant' : 'user') as 'assistant' | 'user',
       content: typeof h.parts === 'string' ? h.parts : h.parts?.[0]?.text || ''

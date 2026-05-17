@@ -54,13 +54,7 @@ interface Lesson {
   content_type: 'video' | 'text' | 'quiz' | 'flashcard' | 'ai_prompt' | 'voice_task' | 'interactive';
   content_url?: string;
   prompt_template?: string;
-  content_json?: {
-    objectives?: string[];
-    vocabulary?: { word: string; pinyin: string; mean: string }[];
-    grammar?: { title: string; note: string }[];
-    homework_id?: string;
-    worksheet_url?: string;
-  };
+  content_json?: any;
   duration_minutes?: number;
 }
 
@@ -140,6 +134,10 @@ export default function EduAdminWorkspace() {
   // Access Code Management States
   const [accessCodes, setAccessCodes] = useState<any[]>([]);
   const [generatingCode, setGeneratingCode] = useState(false);
+
+  // JSON Template Preview & Upload States
+  const [showSampleModal, setShowSampleModal] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   // UI States
   const [view, setView] = useState<'list' | 'curriculum'>('list');
@@ -1337,38 +1335,473 @@ export default function EduAdminWorkspace() {
                                                       </div>
 
                                                       <div className="space-y-4">
-                                                         <div className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 space-y-4">
-                                                            <p className="text-[10px] font-black text-[#2E3192] uppercase tracking-widest flex items-center gap-2">
-                                                               <Target className="w-3.5 h-3.5" /> Nội dung bài học (JSON)
-                                                            </p>
-                                                            <textarea 
-                                                               defaultValue={lesson.content_json ? JSON.stringify(lesson.content_json, null, 2) : ''}
-                                                               onBlur={(e) => {
-                                                                  try {
-                                                                     const json = e.target.value ? JSON.parse(e.target.value) : null;
-                                                                     handleUpdateLesson({...lesson, content_json: json});
-                                                                  } catch (err) {
-                                                                     alert('Định dạng JSON không hợp lệ!');
-                                                                  }
-                                                               }}
-                                                               placeholder='{ "objectives": ["Mục tiêu 1"], "vocabulary": [...] }'
-                                                               className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-[10px] font-mono focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all h-36"
-                                                            />
-                                                            <div className="flex gap-2">
-                                                               <button 
-                                                                  onClick={() => {
-                                                                     const template = {
-                                                                        objectives: ["Phát âm chuẩn vận mẫu", "Giao tiếp chào hỏi cơ bản"],
-                                                                        vocabulary: [{ word: "你好", pinyin: "nǐ hǎo", mean: "Xin chào" }],
-                                                                        grammar: [{ title: "Cấu trúc A + B", note: "Dùng để..." }]
-                                                                     };
-                                                                     handleUpdateLesson({...lesson, content_json: template});
-                                                                     fetchData(); // Refresh to show in textarea
-                                                                  }}
-                                                                  className="text-[9px] font-black text-indigo-600 uppercase tracking-widest hover:underline"
-                                                               >
-                                                                  Dùng Template mẫu
-                                                               </button>
+                                                         <div className="p-6 bg-slate-50 rounded-[2.5rem] border border-slate-100 space-y-6">
+                                                            <div className="flex items-center justify-between">
+                                                               <p className="text-[11px] font-black text-[#2E3192] uppercase tracking-widest flex items-center gap-2">
+                                                                  <Bot className="w-4 h-4 text-indigo-500" /> Biên soạn Tri thức cốt lõi
+                                                               </p>
+                                                               <span className="px-2.5 py-0.5 bg-indigo-50 rounded-full text-[8px] font-black uppercase tracking-widest text-[#2E3192]">Trực quan</span>
+                                                            </div>
+
+                                                            {/* SECTION 1: TỪ VỰNG TRONG BÀI */}
+                                                            <div className="space-y-3">
+                                                               <div className="flex items-center justify-between px-1">
+                                                                  <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">1. Từ vựng trong bài</span>
+                                                                  <button 
+                                                                     type="button"
+                                                                     onClick={() => {
+                                                                        const currentVocab = lesson.content_json?.vocabulary || [];
+                                                                        const newVocab = [...currentVocab, { hanzi: '', pinyin: '', meaning: '', usage: '' }];
+                                                                        const newJson = { ...(lesson.content_json || {}), vocabulary: newVocab };
+                                                                        handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                     }}
+                                                                     className="text-[9px] font-black text-[#2E3192] bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded uppercase"
+                                                                  >
+                                                                     + Thêm từ
+                                                                  </button>
+                                                               </div>
+                                                               <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
+                                                                  {(lesson.content_json?.vocabulary || []).map((v: any, vIdx: number) => (
+                                                                     <div key={vIdx} className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm space-y-2 relative group/item">
+                                                                        <button 
+                                                                           type="button"
+                                                                           onClick={() => {
+                                                                              const currentVocab = lesson.content_json?.vocabulary || [];
+                                                                              const newVocab = currentVocab.filter((_, idx) => idx !== vIdx);
+                                                                              const newJson = { ...(lesson.content_json || {}), vocabulary: newVocab };
+                                                                              handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                           }}
+                                                                           className="absolute top-2 right-2 p-1 text-slate-300 hover:text-red-500 rounded transition-colors"
+                                                                           title="Xóa từ"
+                                                                        >
+                                                                           <X className="w-3 h-3" />
+                                                                        </button>
+                                                                        <div className="grid grid-cols-2 gap-2">
+                                                                           <input 
+                                                                              type="text" 
+                                                                              placeholder="Chữ Hán (e.g. 学习)"
+                                                                              defaultValue={v.hanzi || v.word || ''}
+                                                                              onBlur={(e) => {
+                                                                                 const currentVocab = [...(lesson.content_json?.vocabulary || [])];
+                                                                                 currentVocab[vIdx] = { ...currentVocab[vIdx], hanzi: e.target.value };
+                                                                                 const newJson = { ...(lesson.content_json || {}), vocabulary: currentVocab };
+                                                                                 handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                              }}
+                                                                              className="px-2.5 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-black outline-none focus:bg-white w-full"
+                                                                           />
+                                                                           <input 
+                                                                              type="text" 
+                                                                              placeholder="Pinyin (e.g. xuéxí)"
+                                                                              defaultValue={v.pinyin || ''}
+                                                                              onBlur={(e) => {
+                                                                                 const currentVocab = [...(lesson.content_json?.vocabulary || [])];
+                                                                                 currentVocab[vIdx] = { ...currentVocab[vIdx], pinyin: e.target.value };
+                                                                                 const newJson = { ...(lesson.content_json || {}), vocabulary: currentVocab };
+                                                                                 handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                              }}
+                                                                              className="px-2.5 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-semibold outline-none focus:bg-white w-full"
+                                                                           />
+                                                                        </div>
+                                                                        <div className="grid grid-cols-1 gap-2">
+                                                                           <input 
+                                                                              type="text" 
+                                                                              placeholder="Nghĩa tiếng Việt (e.g. Học tập)"
+                                                                              defaultValue={v.meaning || v.mean || ''}
+                                                                              onBlur={(e) => {
+                                                                                 const currentVocab = [...(lesson.content_json?.vocabulary || [])];
+                                                                                 currentVocab[vIdx] = { ...currentVocab[vIdx], meaning: e.target.value, mean: e.target.value };
+                                                                                 const newJson = { ...(lesson.content_json || {}), vocabulary: currentVocab };
+                                                                                 handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                              }}
+                                                                              className="px-2.5 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-black text-indigo-600 outline-none focus:bg-white w-full"
+                                                                           />
+                                                                           <input 
+                                                                              type="text" 
+                                                                              placeholder="Ví dụ cách dùng (e.g. 我在学习 Tiếng Trung)"
+                                                                              defaultValue={v.usage || ''}
+                                                                              onBlur={(e) => {
+                                                                                 const currentVocab = [...(lesson.content_json?.vocabulary || [])];
+                                                                                 currentVocab[vIdx] = { ...currentVocab[vIdx], usage: e.target.value };
+                                                                                 const newJson = { ...(lesson.content_json || {}), vocabulary: currentVocab };
+                                                                                 handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                              }}
+                                                                              className="px-2.5 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[9px] text-slate-500 outline-none focus:bg-white w-full"
+                                                                           />
+                                                                        </div>
+                                                                     </div>
+                                                                  ))}
+                                                                  {(lesson.content_json?.vocabulary || []).length === 0 && (
+                                                                     <p className="text-[10px] text-slate-400 italic text-center py-2">Chưa có từ vựng lõi nào.</p>
+                                                                  )}
+                                                               </div>
+                                                            </div>
+
+                                                            {/* SECTION 2: TỪ VỰNG MỞ RỘNG */}
+                                                            <div className="space-y-3 pt-3 border-t border-slate-200/60">
+                                                               <div className="flex items-center justify-between px-1">
+                                                                  <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">2. Từ vựng mở rộng (Nhà máy)</span>
+                                                                  <button 
+                                                                     type="button"
+                                                                     onClick={() => {
+                                                                        const currentExt = lesson.content_json?.extended_vocabulary || [];
+                                                                        const newExt = [...currentExt, { id: 'ext-' + Date.now(), hanzi: '', pinyin: '', meaning: '', usage: '' }];
+                                                                        const newJson = { ...(lesson.content_json || {}), extended_vocabulary: newExt };
+                                                                        handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                     }}
+                                                                     className="text-[9px] font-black text-orange-600 bg-orange-50 hover:bg-orange-100 px-2 py-0.5 rounded uppercase"
+                                                                  >
+                                                                     + Thêm mở rộng
+                                                                  </button>
+                                                               </div>
+                                                               <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
+                                                                  {(lesson.content_json?.extended_vocabulary || []).map((v: any, vIdx: number) => (
+                                                                     <div key={vIdx} className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm space-y-2 relative group/item">
+                                                                        <button 
+                                                                           type="button"
+                                                                           onClick={() => {
+                                                                              const currentExt = lesson.content_json?.extended_vocabulary || [];
+                                                                              const newExt = currentExt.filter((_, idx) => idx !== vIdx);
+                                                                              const newJson = { ...(lesson.content_json || {}), extended_vocabulary: newExt };
+                                                                              handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                           }}
+                                                                           className="absolute top-2 right-2 p-1 text-slate-300 hover:text-red-500 rounded transition-colors"
+                                                                           title="Xóa từ"
+                                                                        >
+                                                                           <X className="w-3 h-3" />
+                                                                        </button>
+                                                                        <div className="grid grid-cols-2 gap-2">
+                                                                           <input 
+                                                                              type="text" 
+                                                                              placeholder="Chữ Hán (e.g. 不良品)"
+                                                                              defaultValue={v.hanzi || ''}
+                                                                              onBlur={(e) => {
+                                                                                 const currentExt = [...(lesson.content_json?.extended_vocabulary || [])];
+                                                                                 currentExt[vIdx] = { ...currentExt[vIdx], hanzi: e.target.value };
+                                                                                 const newJson = { ...(lesson.content_json || {}), extended_vocabulary: currentExt };
+                                                                                 handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                              }}
+                                                                              className="px-2.5 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-black outline-none focus:bg-white w-full"
+                                                                           />
+                                                                           <input 
+                                                                              type="text" 
+                                                                              placeholder="Pinyin (e.g. bùliángpǐn)"
+                                                                              defaultValue={v.pinyin || ''}
+                                                                              onBlur={(e) => {
+                                                                                 const currentExt = [...(lesson.content_json?.extended_vocabulary || [])];
+                                                                                 currentExt[vIdx] = { ...currentExt[vIdx], pinyin: e.target.value };
+                                                                                 const newJson = { ...(lesson.content_json || {}), extended_vocabulary: currentExt };
+                                                                                 handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                              }}
+                                                                              className="px-2.5 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-semibold outline-none focus:bg-white w-full"
+                                                                           />
+                                                                        </div>
+                                                                        <div className="grid grid-cols-1 gap-2">
+                                                                           <input 
+                                                                              type="text" 
+                                                                              placeholder="Nghĩa tiếng Việt (e.g. Sản phẩm lỗi)"
+                                                                              defaultValue={v.meaning || ''}
+                                                                              onBlur={(e) => {
+                                                                                 const currentExt = [...(lesson.content_json?.extended_vocabulary || [])];
+                                                                                 currentExt[vIdx] = { ...currentExt[vIdx], meaning: e.target.value };
+                                                                                 const newJson = { ...(lesson.content_json || {}), extended_vocabulary: currentExt };
+                                                                                 handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                              }}
+                                                                              className="px-2.5 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-black text-orange-500 outline-none focus:bg-white w-full"
+                                                                           />
+                                                                           <input 
+                                                                              type="text" 
+                                                                              placeholder="Ví dụ cách dùng (e.g. 发现不良品...)"
+                                                                              defaultValue={v.usage || ''}
+                                                                              onBlur={(e) => {
+                                                                                 const currentExt = [...(lesson.content_json?.extended_vocabulary || [])];
+                                                                                 currentExt[vIdx] = { ...currentExt[vIdx], usage: e.target.value };
+                                                                                 const newJson = { ...(lesson.content_json || {}), extended_vocabulary: currentExt };
+                                                                                 handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                              }}
+                                                                              className="px-2.5 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[9px] text-slate-500 outline-none focus:bg-white w-full"
+                                                                           />
+                                                                        </div>
+                                                                     </div>
+                                                                  ))}
+                                                                  {(lesson.content_json?.extended_vocabulary || []).length === 0 && (
+                                                                     <p className="text-[10px] text-slate-400 italic text-center py-2">Chưa có từ vựng mở rộng nào.</p>
+                                                                  )}
+                                                               </div>
+                                                            </div>
+
+                                                            {/* SECTION 3: CẤU TRÚC NGỮ PHÁP */}
+                                                            <div className="space-y-3 pt-3 border-t border-slate-200/60">
+                                                               <div className="flex items-center justify-between px-1">
+                                                                  <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">3. Cấu trúc ngữ pháp</span>
+                                                                  <button 
+                                                                     type="button"
+                                                                     onClick={() => {
+                                                                        const currentGrammar = lesson.content_json?.grammar || [];
+                                                                        const newGrammar = [...currentGrammar, { title: '', note: '', structure: '', formula_json: { verb: '', complement: '', particles: '', result: '' } }];
+                                                                        const newJson = { ...(lesson.content_json || {}), grammar: newGrammar };
+                                                                        handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                     }}
+                                                                     className="text-[9px] font-black text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded uppercase"
+                                                                  >
+                                                                     + Thêm cấu trúc
+                                                                  </button>
+                                                               </div>
+                                                               <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
+                                                                  {(lesson.content_json?.grammar || []).map((g: any, gIdx: number) => (
+                                                                     <div key={gIdx} className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm space-y-2 relative">
+                                                                        <button 
+                                                                           type="button"
+                                                                           onClick={() => {
+                                                                              const currentGrammar = lesson.content_json?.grammar || [];
+                                                                              const newGrammar = currentGrammar.filter((_, idx) => idx !== gIdx);
+                                                                              const newJson = { ...(lesson.content_json || {}), grammar: newGrammar };
+                                                                              handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                           }}
+                                                                           className="absolute top-2 right-2 p-1 text-slate-300 hover:text-red-500 rounded transition-colors"
+                                                                           title="Xóa cấu trúc"
+                                                                        >
+                                                                           <X className="w-3 h-3" />
+                                                                        </button>
+                                                                        <div className="space-y-2">
+                                                                           <input 
+                                                                              type="text" 
+                                                                              placeholder="Tên cấu trúc (e.g. Bổ ngữ kết quả: V + 完 + 了)"
+                                                                              defaultValue={g.title || ''}
+                                                                              onBlur={(e) => {
+                                                                                 const currentGrammar = [...(lesson.content_json?.grammar || [])];
+                                                                                 currentGrammar[gIdx] = { ...currentGrammar[gIdx], title: e.target.value };
+                                                                                 const newJson = { ...(lesson.content_json || {}), grammar: currentGrammar };
+                                                                                 handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                              }}
+                                                                              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-black outline-none focus:bg-white"
+                                                                           />
+                                                                           <textarea 
+                                                                              placeholder="Giải thích ngữ nghĩa & hoàn cảnh ứng dụng tại nhà máy..."
+                                                                              defaultValue={g.note || ''}
+                                                                              onBlur={(e) => {
+                                                                                 const currentGrammar = [...(lesson.content_json?.grammar || [])];
+                                                                                 currentGrammar[gIdx] = { ...currentGrammar[gIdx], note: e.target.value };
+                                                                                 const newJson = { ...(lesson.content_json || {}), grammar: currentGrammar };
+                                                                                 handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                              }}
+                                                                              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[9px] font-medium outline-none focus:bg-white h-12"
+                                                                           />
+                                                                           
+                                                                           {/* Formula Blueprint Creator */}
+                                                                           <div className="bg-slate-900/5 p-2 rounded-xl border border-slate-100 space-y-1.5">
+                                                                              <span className="text-[7px] font-black uppercase text-slate-400 block px-1">Sơ đồ bổ ngữ toán học:</span>
+                                                                              <div className="grid grid-cols-4 gap-1">
+                                                                                 <input 
+                                                                                    type="text" 
+                                                                                    placeholder="Động từ"
+                                                                                    defaultValue={g.formula_json?.verb || ''}
+                                                                                    onBlur={(e) => {
+                                                                                       const currentGrammar = [...(lesson.content_json?.grammar || [])];
+                                                                                       const formula = { ...(currentGrammar[gIdx].formula_json || {}), verb: e.target.value };
+                                                                                       currentGrammar[gIdx] = { ...currentGrammar[gIdx], formula_json: formula };
+                                                                                       const newJson = { ...(lesson.content_json || {}), grammar: currentGrammar };
+                                                                                       handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                                    }}
+                                                                                    className="px-1.5 py-1 bg-white border border-slate-150 rounded text-[8px] font-bold text-center outline-none w-full"
+                                                                                 />
+                                                                                 <input 
+                                                                                    type="text" 
+                                                                                    placeholder="Bổ ngữ"
+                                                                                    defaultValue={g.formula_json?.complement || ''}
+                                                                                    onBlur={(e) => {
+                                                                                       const currentGrammar = [...(lesson.content_json?.grammar || [])];
+                                                                                       const formula = { ...(currentGrammar[gIdx].formula_json || {}), complement: e.target.value };
+                                                                                       currentGrammar[gIdx] = { ...currentGrammar[gIdx], formula_json: formula };
+                                                                                       const newJson = { ...(lesson.content_json || {}), grammar: currentGrammar };
+                                                                                       handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                                    }}
+                                                                                    className="px-1.5 py-1 bg-white border border-slate-150 rounded text-[8px] font-bold text-center text-orange-500 outline-none w-full"
+                                                                                 />
+                                                                                 <input 
+                                                                                    type="text" 
+                                                                                    placeholder="Trợ từ"
+                                                                                    defaultValue={g.formula_json?.particles || ''}
+                                                                                    onBlur={(e) => {
+                                                                                       const currentGrammar = [...(lesson.content_json?.grammar || [])];
+                                                                                       const formula = { ...(currentGrammar[gIdx].formula_json || {}), particles: e.target.value };
+                                                                                       currentGrammar[gIdx] = { ...currentGrammar[gIdx], formula_json: formula };
+                                                                                       const newJson = { ...(lesson.content_json || {}), grammar: currentGrammar };
+                                                                                       handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                                    }}
+                                                                                    className="px-1.5 py-1 bg-white border border-slate-150 rounded text-[8px] font-bold text-center outline-none w-full"
+                                                                                 />
+                                                                                 <input 
+                                                                                    type="text" 
+                                                                                    placeholder="Kết quả"
+                                                                                    defaultValue={g.formula_json?.result || ''}
+                                                                                    onBlur={(e) => {
+                                                                                       const currentGrammar = [...(lesson.content_json?.grammar || [])];
+                                                                                       const formula = { ...(currentGrammar[gIdx].formula_json || {}), result: e.target.value };
+                                                                                       currentGrammar[gIdx] = { ...currentGrammar[gIdx], formula_json: formula };
+                                                                                       const newJson = { ...(lesson.content_json || {}), grammar: currentGrammar };
+                                                                                       handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                                    }}
+                                                                                    className="px-1.5 py-1 bg-emerald-50 border border-emerald-200 rounded text-[8px] font-black text-center text-emerald-600 outline-none w-full"
+                                                                                 />
+                                                                              </div>
+                                                                           </div>
+                                                                        </div>
+                                                                     </div>
+                                                                  ))}
+                                                                  {(lesson.content_json?.grammar || []).length === 0 && (
+                                                                     <p className="text-[10px] text-slate-400 italic text-center py-2">Chưa có cấu trúc ngữ pháp nào.</p>
+                                                                  )}
+                                                               </div>
+                                                            </div>
+
+                                                             {/* SECTION 4: MẪU CÂU TRỌNG TÂM BÀI HỌC */}
+                                                             <div className="space-y-3 pt-3 border-t border-slate-100">
+                                                                <div className="flex items-center justify-between px-1">
+                                                                   <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">4. Mẫu câu trọng tâm bài học</span>
+                                                                   <button 
+                                                                      type="button"
+                                                                      onClick={() => {
+                                                                         const currentSentences = lesson.content_json?.key_sentences || [];
+                                                                         const newSentences = [...currentSentences, { zh: '', pinyin: '', vi: '' }];
+                                                                         const newJson = { ...(lesson.content_json || {}), key_sentences: newSentences };
+                                                                         handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                      }}
+                                                                      className="text-[9px] font-black text-[#2E3192] bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded uppercase"
+                                                                   >
+                                                                      + Thêm câu
+                                                                   </button>
+                                                                </div>
+                                                                <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
+                                                                   {(lesson.content_json?.key_sentences || []).map((s: any, sIdx: number) => (
+                                                                      <div key={sIdx} className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm space-y-2 relative group/item">
+                                                                         <button 
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                               const currentSentences = lesson.content_json?.key_sentences || [];
+                                                                               const newSentences = currentSentences.filter((_, idx) => idx !== sIdx);
+                                                                               const newJson = { ...(lesson.content_json || {}), key_sentences: newSentences };
+                                                                               handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                            }}
+                                                                            className="absolute top-2 right-2 p-1 text-slate-300 hover:text-red-500 rounded transition-colors"
+                                                                            title="Xóa câu"
+                                                                         >
+                                                                            <X className="w-3.5 h-3.5" />
+                                                                         </button>
+                                                                         <div className="grid grid-cols-1 gap-2">
+                                                                            <input 
+                                                                               type="text" 
+                                                                               placeholder="Chữ Hán (e.g. 今天的生产任务完成了没有？)"
+                                                                               defaultValue={s.zh || ''}
+                                                                               onBlur={(e) => {
+                                                                                  const currentSentences = [...(lesson.content_json?.key_sentences || [])];
+                                                                                  currentSentences[sIdx] = { ...currentSentences[sIdx], zh: e.target.value };
+                                                                                  const newJson = { ...(lesson.content_json || {}), key_sentences: currentSentences };
+                                                                                  handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                               }}
+                                                                               className="px-2.5 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-black outline-none focus:bg-white w-full text-slate-800"
+                                                                            />
+                                                                            <input 
+                                                                               type="text" 
+                                                                               placeholder="Pinyin (e.g. Jīntiān de shēngchǎn rènwu wánchéng le méiyǒu?)"
+                                                                               defaultValue={s.pinyin || ''}
+                                                                               onBlur={(e) => {
+                                                                                  const currentSentences = [...(lesson.content_json?.key_sentences || [])];
+                                                                                  currentSentences[sIdx] = { ...currentSentences[sIdx], pinyin: e.target.value };
+                                                                                  const newJson = { ...(lesson.content_json || {}), key_sentences: currentSentences };
+                                                                                  handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                               }}
+                                                                               className="px-2.5 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-semibold outline-none focus:bg-white w-full text-indigo-600"
+                                                                            />
+                                                                            <input 
+                                                                               type="text" 
+                                                                               placeholder="Nghĩa tiếng Việt (e.g. Nhiệm vụ sản xuất hôm nay đã hoàn thành chưa?)"
+                                                                               defaultValue={s.vi || ''}
+                                                                               onBlur={(e) => {
+                                                                                  const currentSentences = [...(lesson.content_json?.key_sentences || [])];
+                                                                                  currentSentences[sIdx] = { ...currentSentences[sIdx], vi: e.target.value };
+                                                                                  const newJson = { ...(lesson.content_json || {}), key_sentences: currentSentences };
+                                                                                  handleUpdateLesson({ ...lesson, content_json: newJson });
+                                                                               }}
+                                                                               className="px-2.5 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold text-slate-600 outline-none focus:bg-white w-full italic"
+                                                                            />
+                                                                         </div>
+                                                                      </div>
+                                                                   ))}
+                                                                   {(lesson.content_json?.key_sentences || []).length === 0 && (
+                                                                      <p className="text-[10px] text-slate-400 italic text-center py-2">Chưa có mẫu câu trọng tâm nào.</p>
+                                                                   )}
+                                                                </div>
+                                                             </div>
+
+                                                            {/* FOOTER ACTIONS: VIEW SAMPLE, UPLOAD FILE, OPEN JSON */}
+                                                            <div className="pt-4 border-t border-slate-200/60 space-y-3">
+                                                               <div className="flex items-center justify-between">
+                                                                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Biên soạn nhanh / Bulk Import:</span>
+                                                                  <div className="flex items-center gap-3">
+                                                                     <button 
+                                                                        type="button"
+                                                                        onClick={() => setShowSampleModal(true)}
+                                                                        className="text-[8.5px] font-black text-indigo-600 hover:text-indigo-800 uppercase tracking-wider flex items-center gap-1 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg transition-all"
+                                                                     >
+                                                                        <Info className="w-3.5 h-3.5" /> Xem File Mẫu
+                                                                     </button>
+                                                                     <label className="text-[8.5px] font-black text-orange-600 hover:text-orange-800 uppercase tracking-wider flex items-center gap-1 bg-orange-50 hover:bg-orange-100 px-2.5 py-1 rounded-lg cursor-pointer transition-all">
+                                                                        <Upload className="w-3.5 h-3.5" /> Up File JSON
+                                                                        <input 
+                                                                           type="file" 
+                                                                           accept=".json" 
+                                                                           className="hidden" 
+                                                                           onChange={(e) => {
+                                                                              const file = e.target.files?.[0];
+                                                                              if (file) {
+                                                                                 const reader = new FileReader();
+                                                                                 reader.onload = (event) => {
+                                                                                    try {
+                                                                                       const parsed = JSON.parse(event.target?.result as string);
+                                                                                       if (!parsed.vocabulary && !parsed.extended_vocabulary && !parsed.grammar && !parsed.key_sentences) {
+                                                                                           alert("File JSON không đúng cấu trúc Tri thức cốt lõi!");
+                                                                                           return;
+                                                                                        }
+                                                                                        const updatedJson = {
+                                                                                           ...(lesson.content_json || {}),
+                                                                                           vocabulary: parsed.vocabulary || lesson.content_json?.vocabulary || [],
+                                                                                           extended_vocabulary: parsed.extended_vocabulary || lesson.content_json?.extended_vocabulary || [],
+                                                                                           grammar: parsed.grammar || lesson.content_json?.grammar || [],
+                                                                                           key_sentences: parsed.key_sentences || lesson.content_json?.key_sentences || []
+                                                                                        };
+                                                                                       handleUpdateLesson({ ...lesson, content_json: updatedJson });
+                                                                                       alert("Đã tải lên và áp dụng cấu trúc Tri thức cốt lõi thành công!");
+                                                                                    } catch (err) {
+                                                                                       alert("Lỗi đọc file JSON hoặc định dạng JSON không hợp lệ!");
+                                                                                    }
+                                                                                 };
+                                                                                 reader.readAsText(file);
+                                                                              }
+                                                                           }}
+                                                                        />
+                                                                     </label>
+                                                                  </div>
+                                                               </div>
+                                                               <div className="flex justify-between items-center bg-white p-2 rounded-xl border border-slate-100">
+                                                                  <span className="text-[7.5px] font-bold text-slate-400">Xem & Sửa thô JSON:</span>
+                                                                  <button 
+                                                                     type="button"
+                                                                     onClick={() => {
+                                                                        const rawVal = prompt("Dán chuỗi JSON mới tại đây:", JSON.stringify(lesson.content_json || {}));
+                                                                        if (rawVal) {
+                                                                           try {
+                                                                              const parsed = JSON.parse(rawVal);
+                                                                              handleUpdateLesson({ ...lesson, content_json: parsed });
+                                                                           } catch (err) {
+                                                                              alert("Định dạng JSON không hợp lệ!");
+                                                                           }
+                                                                        }
+                                                                     }}
+                                                                     className="text-[8px] font-black text-slate-500 hover:text-slate-700 uppercase tracking-widest hover:underline"
+                                                                  >
+                                                                     Mở JSON Editor
+                                                                  </button>
+                                                               </div>
                                                             </div>
                                                          </div>
                                                       </div>
@@ -2937,6 +3370,93 @@ export default function EduAdminWorkspace() {
            </div>
         </div>
       )}
+      {/* JSON Sample Preview Modal */}
+      {showSampleModal && (() => {
+         const sampleJsonString = `{
+  "vocabulary": [
+    {
+      "hanzi": "学习",
+      "pinyin": "xuéxí",
+      "meaning": "Học tập",
+      "usage": "我在学习汉语。 (Tôi đang học tiếng Hán.)"
+    }
+  ],
+  "extended_vocabulary": [
+    {
+      "hanzi": "不良品",
+      "pinyin": "bùliángpǐn",
+      "meaning": "Sản phẩm lỗi, phế phẩm",
+      "usage": "发现不良品立即停止作业。 (Phát hiện phế phẩm ngưng thao tác ngay.)"
+    }
+  ],
+  "grammar": [
+    {
+      "title": "Bổ ngữ kết quả: V + 完 + 了",
+      "note": "Trong môi trường nhà máy, hoàn thành là ưu tiên tối thượng. Sử dụng trợ từ 完 (xong) ngay sau động từ để báo cáo nhanh kết quả.",
+      "formula_json": {
+        "verb": "做",
+        "complement": "完",
+        "particles": "completed"
+      }
+    }
+  ],
+  "key_sentences": [
+    {
+      "zh": "今天的生产任务完成了没有？",
+      "pinyin": "Jīntiān de shēngchǎn rènwu wánchéng le méiyǒu?",
+      "vi": "Nhiệm vụ sản xuất hôm nay đã hoàn thành chưa?"
+    }
+  ]
+}`;
+         return (
+           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
+              <div className="bg-slate-950 text-slate-100 rounded-[3rem] w-full max-w-2xl shadow-2xl overflow-hidden border border-slate-800 animate-in zoom-in-95 max-h-[90vh] flex flex-col">
+                 <div className="p-8 border-b border-slate-800 flex items-center justify-between shrink-0">
+                    <div>
+                       <h3 className="text-xl font-black text-white flex items-center gap-2">
+                          <Bot className="w-5 h-5 text-indigo-500" /> Cấu trúc File JSON Mẫu
+                       </h3>
+                       <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">Cấu hình nhanh tri thức cốt lõi</p>
+                    </div>
+                    <button onClick={() => { setShowSampleModal(false); setIsCopied(false); }} className="p-2 hover:bg-slate-900 rounded-full text-slate-400"><X className="w-6 h-6" /></button>
+                 </div>
+                 <div className="p-8 space-y-6 overflow-y-auto flex-1 font-mono text-[10px] text-indigo-300 leading-normal scrollbar-thin bg-slate-900/50">
+                    <pre className="bg-slate-900 p-6 rounded-2xl border border-slate-800 overflow-x-auto text-left whitespace-pre">
+                       {sampleJsonString}
+                    </pre>
+                 </div>
+                 <div className="p-6 border-t border-slate-800 flex gap-4 shrink-0 bg-slate-950">
+                    <button 
+                       onClick={() => {
+                          navigator.clipboard.writeText(sampleJsonString);
+                          setIsCopied(true);
+                          setTimeout(() => setIsCopied(false), 2000);
+                       }}
+                       className="flex-1 py-3 bg-white/10 hover:bg-white/15 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                    >
+                       {isCopied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                       {isCopied ? "Đã sao chép!" : "Sao chép JSON"}
+                    </button>
+                    <button 
+                       onClick={() => {
+                          const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(sampleJsonString);
+                          const downloadAnchor = document.createElement('a');
+                          downloadAnchor.setAttribute("href", dataStr);
+                          downloadAnchor.setAttribute("download", "toxi_core_knowledge_template.json");
+                          document.body.appendChild(downloadAnchor);
+                          downloadAnchor.click();
+                          downloadAnchor.remove();
+                       }}
+                       className="flex-1 py-3 bg-[#2E3192] hover:bg-[#2E3192]/90 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center gap-2"
+                    >
+                       <Download className="w-4 h-4" /> Tải File (.json)
+                    </button>
+                 </div>
+              </div>
+           </div>
+         );
+      })()}
+
       {/* Project Modal */}
       {isProjectModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">

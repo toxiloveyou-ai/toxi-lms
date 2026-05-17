@@ -41,7 +41,7 @@ export async function deepseekGenerate(
       model: model,
       messages,
       temperature: model === DEEPSEEK_MODELS.R1 ? undefined : 0.7, // R1 doesn't support temp 0.7 sometimes or behaves differently
-      max_tokens: 2048,
+      max_tokens: 4096,
     }),
   });
 
@@ -77,7 +77,7 @@ export async function deepseekGenerateJSON<T = any>(
       messages,
       response_format: model === DEEPSEEK_MODELS.R1 ? undefined : { type: 'json_object' }, // R1 doesn't support json_object yet
       temperature: model === DEEPSEEK_MODELS.R1 ? undefined : 0.3,
-      max_tokens: 2048,
+      max_tokens: 4096,
     }),
   });
 
@@ -153,7 +153,7 @@ export async function deepseekChat(
       model: model,
       messages,
       temperature: model === DEEPSEEK_MODELS.R1 ? undefined : 0.85,
-      max_tokens: 1024,
+      max_tokens: 4096,
     }),
   });
 

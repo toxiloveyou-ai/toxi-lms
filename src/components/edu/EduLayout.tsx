@@ -39,7 +39,7 @@ export default function EduLayout() {
   
   const { scrollY } = useScroll();
 
-  const isLessonPage = location.pathname.includes('/lesson/');
+  const isLessonPage = location.pathname.includes('/lesson/') || location.pathname.includes('/learn');
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 20);
@@ -118,7 +118,18 @@ export default function EduLayout() {
                 })}
               </nav>
 
-              <div className="flex items-center gap-3 relative z-[110]">
+              <div className="flex items-center gap-2.5 md:gap-3 relative z-[110]">
+                {/* Toxi AI Header Shortcut - Extremely prominent & professional */}
+                <button 
+                  onClick={() => window.dispatchEvent(new CustomEvent('open-toxi-ai'))}
+                  className="flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-[#2E3192] to-indigo-600 hover:from-indigo-600 hover:to-[#2E3192] text-white font-black text-[9px] md:text-[10px] uppercase tracking-widest shadow-md hover:shadow-indigo-500/20 active:scale-95 transition-all group"
+                  title="Hỏi trợ lý học tập Toxi AI"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-orange-300 group-hover:rotate-12 transition-transform animate-pulse" />
+                  <span className="hidden sm:inline">Hỏi Toxi AI</span>
+                  <span className="sm:hidden">Toxi AI</span>
+                </button>
+
                 <button onClick={() => setShowNotifications(!showNotifications)} className="p-3 rounded-2xl bg-slate-50 text-slate-400 relative hover:bg-slate-100 transition-colors">
                   <Bell className="w-5 h-5" />
                   {unreadCount > 0 && <span className="absolute top-2.5 right-2.5 w-3 h-3 bg-orange-500 rounded-full border-2 border-white" />}
@@ -167,7 +178,7 @@ export default function EduLayout() {
       )}
 
       {/* 2. MAIN CONTENT */}
-      <main className={`${isLessonPage ? 'pt-0' : 'pt-24 md:pt-36'} max-w-[1800px] mx-auto min-h-screen px-4 md:px-8 pb-32 relative z-10`}>
+      <main className={isLessonPage ? 'w-full h-screen overflow-hidden relative z-10' : 'pt-24 md:pt-36 max-w-[1800px] mx-auto min-h-screen px-4 md:px-8 pb-32 relative z-10'}>
         <Outlet />
       </main>
 
