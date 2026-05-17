@@ -1,12 +1,9 @@
-import { geminiGenerate, geminiGenerateJSON, geminiChat, geminiVision } from './gemini';
-import { deepseekGenerate, deepseekGenerateJSON, deepseekChat, DEEPSEEK_MODELS } from './deepseek';
+import { supabase } from './supabase';
 
 /**
  * AI Bridge — Toxi AI
- * Một lớp trung gian để quản lý và chuyển đổi linh hoạt giữa các AI Provider (Gemini & DeepSeek).
- * Nguyên tắc: 
- * - V3 (deepseek-chat) -> 90% tác vụ hàng ngày (nhanh, rẻ).
- * - R1 (deepseek-reasoner) -> 10% tác vụ cần phân tích sâu (suy luận tốt).
+ * Một lớp trung gian bảo mật để quản lý và chuyển đổi linh hoạt giữa các AI Provider (Gemini & DeepSeek)
+ * thông qua Supabase Edge Function Proxy.
  */
 
 export type AIProvider = 'gemini' | 'deepseek' | 'tongxiao';
@@ -18,7 +15,6 @@ const DEFAULT_PROVIDER: AIProvider = (import.meta.env.VITE_AI_PROVIDER as AIProv
  */
 const CHARACTER_SAFETY_INSTRUCTION = "\n[QUY TẮC KỸ THUẬT: Trả về văn bản chuẩn UTF-8. Hãy sử dụng định dạng bôi đậm ** cho từ khóa quan trọng và dấu gạch đầu dòng - để liệt kê danh sách khi cần thiết để thông tin được rõ ràng, trực quan.]";
 
-
 /**
  * Tạo văn bản (One-shot)
  */
@@ -27,21 +23,26 @@ export async function aiGenerate(
   provider: AIProvider = DEFAULT_PROVIDER,
   useReasoner: boolean = false
 ): Promise<string> {
-  const dsModel = useReasoner ? DEEPSEEK_MODELS.R1 : DEEPSEEK_MODELS.V3;
   const safePrompt = prompt + CHARACTER_SAFETY_INSTRUCTION;
-  console.log(`[AI Bridge] Using ${provider} (${(provider === 'deepseek' || provider === 'tongxiao') ? dsModel : 'flash'}) for text generation...`);
+  console.log(`[AI Bridge Secure Proxy] Routing one-shot generation to ${provider} via Supabase Edge Function...`);
   
   try {
-    if (provider === 'deepseek' || provider === 'tongxiao') {
-      const text = await deepseekGenerate(safePrompt, undefined, dsModel);
-      // [TOXI AI Update] Loại bỏ thẻ <thought> của R1 để không hiển thị cho người dùng
-      return text.replace(/<thought>[\s\S]*?<\/thought>/g, '').trim();
-    }
-    return await geminiGenerate(safePrompt);
+    const { data, error } = await supabase.functions.invoke('toxi-ai', {
+      body: {
+        action: 'generate',
+        provider,
+        useReasoner,
+        payload: {
+          prompt: safePrompt
+        }
+      }
+    });
+
+    if (error) throw error;
+    return (data.text || "").replace(/<thought>[\s\S]*?<\/thought>/g, '').trim();
   } catch (error) {
-    console.error(`[AI Bridge] ${provider} failed, falling back...`, error);
-    if (provider === 'deepseek' || provider === 'tongxiao') return await geminiGenerate(safePrompt);
-    return await deepseekGenerate(safePrompt, undefined, DEEPSEEK_MODELS.V3);
+    console.error(`[AI Bridge Error]`, error);
+    throw new Error("Không thể kết nối với dịch vụ AI bảo mật.");
   }
 }
 
@@ -53,18 +54,29 @@ export async function aiGenerateJSON<T = any>(
   provider: AIProvider = DEFAULT_PROVIDER,
   useReasoner: boolean = false
 ): Promise<T> {
-  const dsModel = useReasoner ? DEEPSEEK_MODELS.R1 : DEEPSEEK_MODELS.V3;
-  console.log(`[AI Bridge] Using ${provider} (${(provider === 'deepseek' || provider === 'tongxiao') ? dsModel : 'flash'}) for JSON generation...`);
+  console.log(`[AI Bridge Secure Proxy] Routing JSON generation to ${provider} via Supabase Edge Function...`);
 
   try {
-    if (provider === 'deepseek' || provider === 'tongxiao') {
-      return await deepseekGenerateJSON<T>(prompt, undefined, dsModel);
-    }
-    return await geminiGenerateJSON<T>(prompt);
+    const { data, error } = await supabase.functions.invoke('toxi-ai', {
+      body: {
+        action: 'generateJSON',
+        provider,
+        useReasoner,
+        payload: {
+          prompt
+        }
+      }
+    });
+
+    if (error) throw error;
+    
+    const rawText = data.text || "{}";
+    const jsonMatch = rawText.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+    const cleaned = jsonMatch ? jsonMatch[0].trim() : rawText;
+    return JSON.parse(cleaned) as T;
   } catch (error) {
-    console.error(`[AI Bridge] ${provider} JSON failed, falling back...`, error);
-    if (provider === 'deepseek' || provider === 'tongxiao') return await geminiGenerateJSON<T>(prompt);
-    return await deepseekGenerateJSON<T>(prompt, undefined, DEEPSEEK_MODELS.V3);
+    console.error(`[AI Bridge JSON Error]`, error);
+    throw new Error("Không thể tạo dữ liệu cấu trúc AI bảo mật.");
   }
 }
 
@@ -78,30 +90,28 @@ export async function aiChat(
   provider: AIProvider = DEFAULT_PROVIDER,
   useReasoner: boolean = false
 ): Promise<string> {
-  const dsModel = useReasoner ? DEEPSEEK_MODELS.R1 : DEEPSEEK_MODELS.V3;
   const safeSystem = systemInstruction + CHARACTER_SAFETY_INSTRUCTION;
-  console.log(`[AI Bridge] Using ${provider} (${(provider === 'deepseek' || provider === 'tongxiao') ? dsModel : 'flash'}) for chat...`);
+  console.log(`[AI Bridge Secure Proxy] Routing chat to ${provider} via Supabase Edge Function...`);
 
   try {
-    if (provider === 'deepseek' || provider === 'tongxiao') {
-      const dsHistory = history.map(h => ({
-        role: (h.role === 'model' ? 'assistant' : 'user') as 'assistant' | 'user',
-        content: typeof h.parts === 'string' ? h.parts : h.parts?.[0]?.text || ''
-      }));
-      const text = await deepseekChat(safeSystem, dsHistory, userMessage, dsModel);
-      // [TOXI AI Update] Loại bỏ thẻ <thought> của R1 để không hiển thị cho người dùng
-      return text.replace(/<thought>[\s\S]*?<\/thought>/g, '').trim();
-    }
-    return await geminiChat(safeSystem, history, userMessage);
+    const { data, error } = await supabase.functions.invoke('toxi-ai', {
+      body: {
+        action: 'chat',
+        provider,
+        useReasoner,
+        payload: {
+          systemInstruction: safeSystem,
+          history,
+          userMessage
+        }
+      }
+    });
+
+    if (error) throw error;
+    return (data.text || "").replace(/<thought>[\s\S]*?<\/thought>/g, '').trim();
   } catch (error) {
-    console.error(`[AI Bridge] ${provider} chat failed, falling back...`, error);
-    if (provider === 'deepseek' || provider === 'tongxiao') return await geminiChat(safeSystem, history, userMessage);
-    const dsHistory = history.map(h => ({
-      role: (h.role === 'model' ? 'assistant' : 'user') as 'assistant' | 'user',
-      content: typeof h.parts === 'string' ? h.parts : h.parts?.[0]?.text || ''
-    }));
-    const text = await deepseekChat(safeSystem, dsHistory, userMessage, DEEPSEEK_MODELS.V3);
-    return text.replace(/<thought>[\s\S]*?<\/thought>/g, '').trim();
+    console.error(`[AI Bridge Chat Error]`, error);
+    throw new Error("Không thể kết nối với dịch vụ AI bảo mật.");
   }
 }
 
@@ -112,9 +122,28 @@ export async function aiVision<T = any>(
   prompt: string, 
   base64Image: string
 ): Promise<T> {
-  console.log(`[AI Bridge] Using gemini for Vision analysis...`);
-  // Hiện tại chỉ Gemini hỗ trợ Vision tốt qua API chuẩn
-  return await geminiVision<T>(prompt, base64Image);
+  console.log(`[AI Bridge Secure Proxy] Routing vision to Gemini via Supabase Edge Function...`);
+
+  try {
+    const { data, error } = await supabase.functions.invoke('toxi-ai', {
+      body: {
+        action: 'vision',
+        provider: 'gemini',
+        payload: {
+          prompt,
+          base64Image
+        }
+      }
+    });
+
+    if (error) throw error;
+    
+    const rawText = data.text || "{}";
+    const jsonMatch = rawText.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+    const cleaned = jsonMatch ? jsonMatch[0].trim() : rawText;
+    return JSON.parse(cleaned) as T;
+  } catch (error) {
+    console.error(`[AI Bridge Vision Error]`, error);
+    throw new Error("Không thể xử lý phân tích hình ảnh bảo mật.");
+  }
 }
-
-
