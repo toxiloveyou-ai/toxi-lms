@@ -39,7 +39,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
-import { getCourseProgress, completeLessonAndAwardXP } from '../../lib/api/lessonProgress';
+import { getCourseProgress, completeLessonAndAwardXP, getMySubmissions } from '../../lib/api/lessonProgress';
 import { generateEduRoleplayResponse, askLessonAssistant, scoreLessonSubmission } from '../../lib/api/eduAI';
 
 const PRACTICE_EXERCISES = [
@@ -215,6 +215,7 @@ export default function EduLessonPlayer() {
    const [rehearsalInput, setRehearsalInput] = useState('');
    const [rehearsalResult, setRehearsalResult] = useState<{ score: number; grammarFeedback: string; xpReward: number; suggestions: string } | null>(null);
    const [rehearsalLoading, setRehearsalLoading] = useState(false);
+   const [submissions, setSubmissions] = useState<any[]>([]);
 
    // AI State
    const [roleplayChat, setRoleplayChat] = useState<any[]>([
@@ -279,6 +280,8 @@ export default function EduLessonPlayer() {
             if (user) {
                const map = await getCourseProgress(user.id, lessonsData.map(l => l.id));
                setProgressMap(map);
+               const mySubs = await getMySubmissions(user.id, current.id);
+               setSubmissions(mySubs || []);
             }
          }
       } catch (err) { console.error(err); }
@@ -287,6 +290,12 @@ export default function EduLessonPlayer() {
 
    const handleCompleteLesson = async () => {
       if (!currentUser || !activeLesson || completingLesson) return;
+      const hasVocab = activeLesson?.content_json?.vocabulary && activeLesson.content_json.vocabulary.length > 0;
+      const isVocabMastered = !hasVocab || srsSessionCompleted;
+      const isHomeworkSubmitted = submissions && submissions.length > 0;
+      
+      if (!isVocabMastered || !isHomeworkSubmitted) return;
+      
       try {
          setCompletingLesson(true);
          const xp = earnedXP || 50;
@@ -1858,7 +1867,44 @@ export default function EduLessonPlayer() {
                                     placeholder="Viết câu thực hành hoặc câu hỏi cho giáo viên tại đây..." 
                                     className="w-full h-48 p-8 bg-slate-50 border border-slate-100 rounded-[2.5rem] focus:outline-none focus:bg-white focus:border-[#2E3192]/30 transition-all text-base font-bold shadow-inner" 
                                  />
-                                 <button onClick={handleCompleteLesson} className="w-full py-5 bg-gradient-to-r from-[#2E3192] to-indigo-600 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-2xl shadow-indigo-900/20 hover:scale-[1.01] transition-all">Lưu nháp & Hoàn thành bài học</button>
+
+                                 {/* Yêu cầu hoàn thành bài học */}
+                                 <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100/80 space-y-4">
+                                    <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                                       <Activity className="w-3.5 h-3.5 text-[#2E3192]" /> Điều kiện để hoàn thành bài giảng:
+                                    </h4>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                       {/* Điều kiện 1: Từ vựng SRS */}
+                                       <div className={`p-4 rounded-2xl border flex items-center gap-3 transition-all ${(!activeLesson?.content_json?.vocabulary || activeLesson.content_json.vocabulary.length === 0 || srsSessionCompleted) ? 'bg-emerald-50/50 border-emerald-100 text-emerald-800' : 'bg-red-50/50 border-red-100 text-red-800'}`}>
+                                          <span className="text-sm shrink-0">{(!activeLesson?.content_json?.vocabulary || activeLesson.content_json.vocabulary.length === 0 || srsSessionCompleted) ? '🟢' : '🔒'}</span>
+                                          <div className="space-y-0.5">
+                                             <p className="text-[8px] font-black uppercase tracking-wider">Học từ vựng SRS</p>
+                                             <p className="text-[10px] font-bold text-slate-500">
+                                                {(!activeLesson?.content_json?.vocabulary || activeLesson.content_json.vocabulary.length === 0) ? 'Không yêu cầu' : srsSessionCompleted ? 'Đã thuộc từ vựng' : 'Chưa thuộc từ (Xem Phòng học)'}
+                                             </p>
+                                          </div>
+                                       </div>
+
+                                       {/* Điều kiện 2: Nộp bài tập */}
+                                       <div className={`p-4 rounded-2xl border flex items-center gap-3 transition-all ${(submissions && submissions.length > 0) ? 'bg-emerald-50/50 border-emerald-100 text-emerald-800' : 'bg-red-50/50 border-red-100 text-red-800'}`}>
+                                          <span className="text-sm shrink-0">{(submissions && submissions.length > 0) ? '🟢' : '🔒'}</span>
+                                          <div className="space-y-0.5">
+                                             <p className="text-[8px] font-black uppercase tracking-wider">Nộp bài tập chính thức</p>
+                                             <p className="text-[10px] font-bold text-slate-500">
+                                                {(submissions && submissions.length > 0) ? `Đã nộp (${submissions.length} bản)` : 'Chưa nộp bài tập chính thức'}
+                                             </p>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+
+                                 <button 
+                                    onClick={handleCompleteLesson} 
+                                    disabled={!((!activeLesson?.content_json?.vocabulary || activeLesson.content_json.vocabulary.length === 0 || srsSessionCompleted) && (submissions && submissions.length > 0))}
+                                    className={`w-full py-5 rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-2xl transition-all hover:scale-[1.01] ${((!activeLesson?.content_json?.vocabulary || activeLesson.content_json.vocabulary.length === 0 || srsSessionCompleted) && (submissions && submissions.length > 0)) ? 'bg-gradient-to-r from-[#2E3192] to-indigo-600 text-white shadow-indigo-900/20' : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none opacity-80'}`}
+                                 >
+                                    {((!activeLesson?.content_json?.vocabulary || activeLesson.content_json.vocabulary.length === 0 || srsSessionCompleted) && (submissions && submissions.length > 0)) ? 'Lưu nháp & Hoàn thành bài học' : '🔒 Hãy hoàn thành các điều kiện để hoàn tất'}
+                                 </button>
                               </div>
                            </motion.div>
                         )}
