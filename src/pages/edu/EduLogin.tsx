@@ -156,8 +156,8 @@ export default function EduLogin() {
       {/* Main Content */}
       <div className="w-full max-w-sm p-6 sm:p-8 bg-white/90 backdrop-blur-xl rounded-[2.5rem] relative z-10 border border-white/20 shadow-2xl space-y-6">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-[1.5rem] overflow-hidden mx-auto mb-4 shadow-xl shadow-indigo-500/20 relative group hover:scale-105 transition-transform duration-500">
-            <img src="/assets/images/toxi_edu_logo.png" alt="TOXI EDU" className="w-full h-full object-cover" />
+          <div className="w-16 h-16 rounded-[1.5rem] bg-gradient-to-br from-[#2E3192] to-indigo-900 flex items-center justify-center mx-auto mb-4 shadow-xl shadow-indigo-500/20 relative group hover:scale-105 transition-transform duration-500 cursor-pointer">
+            <BookOpen className="w-8 h-8 text-white group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500" />
             <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full border-2 border-white flex items-center justify-center">
               <Cpu className="w-2 h-2 text-white" />
             </div>

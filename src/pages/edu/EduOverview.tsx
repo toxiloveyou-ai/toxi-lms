@@ -46,6 +46,96 @@ function formatXP(xp: number) {
   return xp.toString();
 }
 
+// Helper to safely format and display AI tips without duplicate quotes or raw markdown characters (**, `, bullet points)
+function renderFormattedTip(text: string) {
+  if (!text) return null;
+  
+  // Clean wrapped quotes
+  let cleanText = text.trim();
+  if (cleanText.startsWith('"') && cleanText.endsWith('"')) {
+    cleanText = cleanText.substring(1, cleanText.length - 1).trim();
+  }
+  if (cleanText.startsWith('“') && cleanText.endsWith('”')) {
+    cleanText = cleanText.substring(1, cleanText.length - 1).trim();
+  }
+  if (cleanText.startsWith('\'') && cleanText.endsWith('\'')) {
+    cleanText = cleanText.substring(1, cleanText.length - 1).trim();
+  }
+  
+  const lines = cleanText.split('\n');
+  
+  return lines.map((line, lineIdx) => {
+    let cleanLine = line.trim();
+    const isBullet = cleanLine.startsWith('- ') || cleanLine.startsWith('* ') || cleanLine.startsWith('• ');
+    if (isBullet) {
+      cleanLine = cleanLine.substring(2).trim();
+    }
+    
+    const segments: React.ReactNode[] = [];
+    let i = 0;
+    let currentText = '';
+    
+    while (i < cleanLine.length) {
+      // Bold (**text**)
+      if (cleanLine.substring(i, i + 2) === '**') {
+        if (currentText) {
+          segments.push(<span key={segments.length}>{currentText}</span>);
+          currentText = '';
+        }
+        const closingIdx = cleanLine.indexOf('**', i + 2);
+        if (closingIdx !== -1) {
+          const boldText = cleanLine.substring(i + 2, closingIdx);
+          segments.push(
+            <strong key={segments.length} className="font-black text-[#2E3192] bg-indigo-50/70 px-1.5 py-0.5 rounded-md">
+              {boldText}
+            </strong>
+          );
+          i = closingIdx + 2;
+        } else {
+          currentText += '**';
+          i += 2;
+        }
+      }
+      // Inline code (`code`)
+      else if (cleanLine[i] === '`') {
+        if (currentText) {
+          segments.push(<span key={segments.length}>{currentText}</span>);
+          currentText = '';
+        }
+        const closingIdx = cleanLine.indexOf('`', i + 1);
+        if (closingIdx !== -1) {
+          const codeText = cleanLine.substring(i + 1, closingIdx);
+          segments.push(
+            <code key={segments.length} className="font-mono text-[10px] bg-slate-100 text-rose-500 px-1 py-0.5 rounded border border-slate-200/60">
+              {codeText}
+            </code>
+          );
+          i = closingIdx + 1;
+        } else {
+          currentText += '`';
+          i += 1;
+        }
+      } 
+      // Normal characters
+      else {
+        currentText += cleanLine[i];
+        i++;
+      }
+    }
+    
+    if (currentText) {
+      segments.push(<span key={segments.length}>{currentText}</span>);
+    }
+    
+    return (
+      <span key={lineIdx} className="block mt-1 first:mt-0">
+        {isBullet && <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mr-2 shrink-0 align-middle"></span>}
+        {segments}
+      </span>
+    );
+  });
+}
+
 export default function EduOverview() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
@@ -387,7 +477,11 @@ export default function EduOverview() {
                    <div className="space-y-8">
                       <div className="p-6 bg-slate-50 rounded-[2rem] border-l-4 border-[#2E3192] relative group-hover:bg-white transition-colors duration-500 shadow-inner">
                          <p className="text-sm text-slate-700 leading-relaxed font-bold italic">
-                            "{aiTip || "Đang phân tích xu hướng học tập của bạn để đưa ra lời khuyên tối ưu nhất..."}"
+                            {aiTip ? (
+                              <>“{renderFormattedTip(aiTip)}”</>
+                            ) : (
+                              "“Đang phân tích xu hướng học tập của bạn để đưa ra lời khuyên tối ưu nhất...”"
+                            )}
                          </p>
                       </div>
                       <button className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:bg-[#2E3192] transition-all flex items-center justify-center gap-3 group/tip" onClick={() => window.dispatchEvent(new CustomEvent('open-toxi-ai'))}>

@@ -78,7 +78,7 @@ export default function EduLayout() {
     { path: '/edu/practice', icon: Zap, label: 'Thực chiến' },
     { path: '/edu/library', icon: BookMarked, label: 'Thư viện' },
     { path: '/edu/explore', icon: Search, label: 'Khoá học' },
-    { path: '/edu/referral', icon: Share2, label: 'Giới thiệu' },
+    { path: '/edu/referral', icon: Share2, label: 'Giới thiệu bạn bè' },
   ];
 
   const handleLogout = async () => {
